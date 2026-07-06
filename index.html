@@ -40,7 +40,7 @@
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             background: rgba(21, 16, 42, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -52,7 +52,6 @@
             overflow: hidden;
         }
 
-        /* توهج خلفي خفيف وحركة */
         .container::before {
             content: '';
             position: absolute;
@@ -367,16 +366,17 @@
 
         <div class="task-card">
             <label>📖 قراءة سفر دانيال (النبي):</label>
-            <span class="hint">كل إصحاح بـ 1 نقطة. عند إتمام السفر كاملاً هتاخد 10 نقط إضافية تلقائياً!</span>
+            <!-- [تعديل] تغيير التنبيه ليكون 12 إصحاح -->
+            <span class="hint">كل إصحاح بـ 1 نقطة. عند إتمام السفر كاملاً (12 إصحاح) هتاخد 10 نقط إضافية تلقائياً!</span>
             <div class="task-row" style="margin-top: 14px;">
                 <span style="font-size: 14px; color: #c9c4e6;">حدد عدد الإصحاحات اليوم:</span>
+                <!-- [تعديل] قفل الخيارات عند إصحاح 12 وعمل السفر كامل عنده -->
                 <select id="danChapters" style="width: auto; padding: 8px 12px;">
                     <option value="0">0</option>
                     <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                     <option value="4">4</option><option value="5">5</option><option value="6">6</option>
                     <option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
-                    <option value="13">13</option><option value="14">14 (السفر كامل)</option>
+                    <option value="10">10</option><option value="11">11</option><option value="12">12 (السفر كامل)</option>
                 </select>
             </div>
         </div>
@@ -392,7 +392,7 @@
                 <select id="massCount" style="width: auto; padding: 8px 12px;">
                     <option value="0">لم أحضر</option>
                     <option value="1">حضور قداس واحد (2 نقطة)</option>
-                    <option value="2">حضور قداسين (5 نقط)</option>
+                    <option value="2">حضور قداسين أو أكثر (5 نقط)</option>
                 </select>
             </div>
         </div>
@@ -407,19 +407,28 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- صفحة الأدمن السري بالعربي -->
+    <!-- صفحة الأدمن السري بالعربي [تعديل الأعمدة لعرض التفاصيل] -->
     <div id="adminPage" class="page">
         <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم الخادم 👑</h2>
-        <table>
-            <thead><tr><th>الاسم الحقيقي</th><th>الكود</th><th>إجمالي النقاط</th></tr></thead>
-            <tbody id="adminTableBody"></tbody>
-        </table>
+        <div style="overflow-x: auto; width: 100%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم الحقيقي</th>
+                        <th>الكود</th>
+                        <th>آخر قراءة للقداس</th>
+                        <th>إصحاحات دانيال</th>
+                        <th>إجمالي النقاط</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody"></tbody>
+            </table>
+        </div>
         <button class="btn-secondary" style="margin-top: 25px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
     </div>
 </div>
 
 <script>
-    // تم ربط بيانات Firebase الخاصة بمشروعك بنجاح
     const firebaseConfig = {
         apiKey: "AIzaSyAUWMRRga0dBeQhdi9jtHBC5vbbxZFWKko",
         authDomain: "khelwaty-6160d.firebaseapp.com",
@@ -436,7 +445,7 @@
     let globalUsers = {};
     let currentUserCode = null;
     
-    // 🔐 ده باسورد الأدمن، غيره براحتك من هنا في أي وقت
+    // 🔐 باسورد الأدمن الخاص بيك
     const ADMIN_PASSWORD = "Foshy2026#"; 
 
     db.ref('users').on('value', (snapshot) => {
@@ -445,6 +454,10 @@
             document.getElementById('userPoints').innerText = globalUsers[currentUserCode].points;
         }
         renderLeaderboard();
+        // تحديث جدول الأدمن تلقائياً لو الصفحة مفتوحة
+        if(document.getElementById('adminPage').classList.contains('active')) {
+            renderAdminTable();
+        }
     });
 
     function showPage(pageId) {
@@ -479,7 +492,9 @@
             password: password,
             code: uniqueCode,
             points: 0,
-            danFinished: false
+            danFinished: false,
+            lastMass: 0,       // [تعديل] إضافة حقول حفظ تفاصيل الأنشطة بالـ Firebase
+            lastChapters: 0
         }, (error) => {
             if(!error) {
                 document.getElementById('generatedCode').innerText = uniqueCode;
@@ -515,11 +530,12 @@
         addedPoints += danCh * 1;
         
         let danFinishedStatus = user.danFinished || false;
-        if (danCh === 14 && !danFinishedStatus) {
+        // [تعديل] حساب مكافأة الـ 10 نقط عند إتمام 12 إصحاحاً بدلاً من 14
+        if (danCh === 12 && !danFinishedStatus) {
             addedPoints += 10;
             danFinishedStatus = true;
-            alert("مبروك! أخذت 10 نقاط إضافية لإتمام سفر دانيال كاملاً 📖");
-        } else if (danCh < 14) {
+            alert("مبروك! أخذت 10 نقاط إضافية لإتمام سفر دانيال كاملاً (12 إصحاح) 📖");
+        } else if (danCh < 12) {
             danFinishedStatus = false;
         }
 
@@ -536,9 +552,12 @@
             return;
         }
 
+        // [تعديل] رفع التفاصيل للسيرفر مع تجميع النقاط عشان تظهر للأدمن
         db.ref('users/' + currentUserCode).update({
             points: user.points + addedPoints,
-            danFinished: danFinishedStatus
+            danFinished: danFinishedStatus,
+            lastMass: massValue,
+            lastChapters: danCh
         });
 
         alert(`تم إضافة ${addedPoints} نقطة بنجاح والتسجيل على السيرفر ☁️`);
@@ -564,18 +583,30 @@
         });
     }
 
+    // [تعديل كامل للدالة] لعرض كل مخدوم عمل إيه بالظبط بالتفصيل للأدمن
     function renderAdminTable() {
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
         const userList = Object.values(globalUsers);
         if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3">No users registered yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5">No users registered yet.</td></tr>`;
             return;
         }
         userList.forEach((user) => {
+            // تحويل قيم القداس لنصوص واضحة
+            let massText = "لم يحضر";
+            if(user.lastMass === 1) massText = "قداس واحد (2ن)";
+            else if(user.lastMass === 2) massText = "قداسين+ (5ن)";
+
+            // عرض عدد الإصحاحات المقروءة
+            let chaptersText = user.lastChapters ? `${user.lastChapters} إصحاح` : "0 إصحاح";
+            if(user.danFinished) chaptersText += " 👑 (تم السفر)";
+
             const row = `<tr>
                 <td><strong style="color: #fff;">${user.name}</strong></td>
                 <td><span style="color: var(--text-muted);">${user.code}</span></td>
+                <td style="color: #00bfff;">${massText}</td>
+                <td style="color: #c471ed;">${chaptersText}</td>
                 <td style="color: var(--admin-color); font-weight: bold;">${user.points} نقطة</td>
             </tr>`;
             tbody.innerHTML += row;
