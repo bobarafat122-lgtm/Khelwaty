@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khelwaty - خلوتي</title>
-    <!-- استدعاء مكتبات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
@@ -21,136 +20,48 @@
             --admin-color: #ff9100;
         }
         
-        * {
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px 15px;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 650px; /* كبرنا العرض شوية عشان جدول الأدمن الجديد */
-            background: rgba(21, 16, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            padding: 30px 24px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(138, 43, 226, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        h2, h3 {
-            text-align: center;
-            color: #fff;
-            font-weight: 800;
-            margin-top: 10px;
-            letter-spacing: 0.5px;
-        }
-        
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg-gradient); min-height: 100vh; margin: 0; padding: 20px 15px; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
+        .container { width: 100%; max-width: 750px; background: rgba(21, 16, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid var(--card-border); padding: 30px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); position: relative; overflow: hidden; }
+        h2, h3 { text-align: center; color: #fff; font-weight: 800; margin-top: 10px; }
         h2 { font-size: 28px; background: linear-gradient(to left, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         p { text-align: center; color: var(--text-muted); font-size: 14px; }
-
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #c9c4e6; }
-
-        input[type="text"], input[type="password"], select {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 12px;
-            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.25);
-        }
-
+        input[type="text"], input[type="password"], select { width: 100%; padding: 14px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 12px; color: #fff; font-size: 15px; outline: none; }
+        button { width: 100%; padding: 14px; background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
         button:hover { transform: translateY(-2px); opacity: 0.95; }
         .btn-secondary { background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%); }
         .btn-success { background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%); margin: 20px auto 10px auto; display: block; }
-        
         .btn-admin-top { position: absolute; top: 20px; left: 20px; width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 20px; }
-
         .page { display: none; }
         .active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
         .code-display { background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(255, 0, 128, 0.4); padding: 18px; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 800; color: #ff0080; }
         .points-badge { text-align: center; font-size: 18px; font-weight: 700; margin: 20px 0; padding: 14px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.2); color: var(--success-color); border-radius: 14px; }
         .points-badge span { font-size: 24px; font-weight: 800; }
-
         .task-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: 16px; margin-bottom: 16px; }
         .task-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-
-        /* تقسيم شبكة الإصحاحات */
-        .chapters-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .checkbox-container input {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--card-border);
-            border-radius: 5px;
-            background: rgba(255,255,255,0.02);
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-        }
+        .chapters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .checkbox-container { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .checkbox-container input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--card-border); border-radius: 5px; background: rgba(255,255,255,0.02); display: grid; place-content: center; cursor: pointer; }
         .checkbox-container input::before { content: "✓"; font-size: 12px; font-weight: bold; color: #fff; transform: scale(0); }
         .checkbox-container input:checked { background: var(--primary-glow); border-color: var(--primary-glow); }
         .checkbox-container input:checked::before { transform: scale(1); }
+        
+        /* شكل العناصر المقفولة والمحفوظة سابقاً */
+        .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; cursor: not-allowed; }
+        .checkbox-container input:disabled::before { color: #888 !important; }
+        .disabled-label { color: #666 !important; cursor: not-allowed; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); }
         th, td { padding: 10px; text-align: center; font-size: 13px; }
         th { background: rgba(255, 255, 255, 0.08); color: #fff; }
         td { background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--card-border); color: #e1def2; }
-
         .nav-links { text-align: center; margin-top: 20px; }
         .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
         hr { border: 0; border-top: 1px solid var(--card-border); margin: 15px 0; }
-        
-        .status-icon { font-size: 16px; }
     </style>
 </head>
 <body>
@@ -208,33 +119,31 @@
         <h3>خلوتك الروحية اليومية 🌟</h3>
         <div class="points-badge">مجموع نقاطك: <span id="userPoints">0</span> نقطة</div>
 
-        <!-- [تعديل] تحويل سفر دانيال لمربعات اختيار متعددة -->
         <div class="task-card">
             <label>📖 قراءة سفر دانيال (النبي):</label>
-            <span class="hint">علّم على كل إصحاح قريته (الإصحاح بـ 1 نقطة). لو قريت الـ 12 كلهم هتاخد 10 نقط زيادة!</span>
+            <span class="hint">الإصحاح المحفوظ سابقاً سيتم قفله رمادياً ولا يمكن إعادة اختياره. قفل الـ 12 يمنحك 10 نقط بونص!</span>
             
             <div class="chapters-grid">
-                <!-- صنعنا 12 تشيك بوكس لكل إصحاح بشكل منفصل -->
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="1"><span>اصحاح 1</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="2"><span>اصحاح 2</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="3"><span>اصحاح 3</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="4"><span>اصحاح 4</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="5"><span>اصحاح 5</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="6"><span>اصحاح 6</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="7"><span>اصحاح 7</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="8"><span>اصحاح 8</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="9"><span>اصحاح 9</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="10"><span>اصحاح 10</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="11"><span>اصحاح 11</span></label>
-                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="12"><span>اصحاح 12</span></label>
+                <label class="checkbox-container" id="lbl-dan-1"><input type="checkbox" class="dan-ch" value="1" id="dan-1"><span>اصحاح 1</span></label>
+                <label class="checkbox-container" id="lbl-dan-2"><input type="checkbox" class="dan-ch" value="2" id="dan-2"><span>اصحاح 2</span></label>
+                <label class="checkbox-container" id="lbl-dan-3"><input type="checkbox" class="dan-ch" value="3" id="dan-3"><span>اصحاح 3</span></label>
+                <label class="checkbox-container" id="lbl-dan-4"><input type="checkbox" class="dan-ch" value="4" id="dan-4"><span>اصحاح 4</span></label>
+                <label class="checkbox-container" id="lbl-dan-5"><input type="checkbox" class="dan-ch" value="5" id="dan-5"><span>اصحاح 5</span></label>
+                <label class="checkbox-container" id="lbl-dan-6"><input type="checkbox" class="dan-ch" value="6" id="dan-6"><span>اصحاح 6</span></label>
+                <label class="checkbox-container" id="lbl-dan-7"><input type="checkbox" class="dan-ch" value="7" id="dan-7"><span>اصحاح 7</span></label>
+                <label class="checkbox-container" id="lbl-dan-8"><input type="checkbox" class="dan-ch" value="8" id="dan-8"><span>اصحاح 8</span></label>
+                <label class="checkbox-container" id="lbl-dan-9"><input type="checkbox" class="dan-ch" value="9" id="dan-9"><span>اصحاح 9</span></label>
+                <label class="checkbox-container" id="lbl-dan-10"><input type="checkbox" class="dan-ch" value="10" id="dan-10"><span>اصحاح 10</span></label>
+                <label class="checkbox-container" id="lbl-dan-11"><input type="checkbox" class="dan-ch" value="11" id="dan-11"><span>اصحاح 11</span></label>
+                <label class="checkbox-container" id="lbl-dan-12"><input type="checkbox" class="dan-ch" value="12" id="dan-12"><span>اصحاح 12</span></label>
             </div>
         </div>
 
         <div class="task-card">
             <label>⚙️ الأنشطة والوسائط الروحية الأخرى:</label>
             <hr>
-            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة/يوم)</span></label></div>
-            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة/يوم)</span></label></div>
+            <div class="task-row"><label class="checkbox-container" id="lblPray"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة/مرة واحدة باليوم)</span></label></div>
+            <div class="task-row"><label class="checkbox-container" id="lblBooks"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة/مرة واحدة باليوم)</span></label></div>
             <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
             <div class="task-row" style="margin-top: 10px;">
                 <span style="font-size: 14px; color: #c9c4e6;">حضور القداسات الإلهية:</span>
@@ -256,7 +165,7 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- [تعديل كامل] صفحة الأدمن لعرض كل الأنشطة بالكامل (أجبية، اعتراف، كتب، دانيال، قداس) -->
+    <!-- صفحة الأدمن المعدلة بالكامل لعرض تواريخ وساعات التحديث -->
     <div id="adminPage" class="page">
         <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم الخادم 👑</h2>
         <div style="overflow-x: auto; width: 100%;">
@@ -269,6 +178,7 @@
                         <th>كتب</th>
                         <th>اعتراف</th>
                         <th>القداس</th>
+                        <th>وقت التسجيل ⏰</th>
                         <th>النقاط</th>
                     </tr>
                 </thead>
@@ -301,6 +211,7 @@
         globalUsers = snapshot.val() || {};
         if(currentUserCode && globalUsers[currentUserCode]) {
             document.getElementById('userPoints').innerText = globalUsers[currentUserCode].points;
+            applyLocks(globalUsers[currentUserCode]);
         }
         renderLeaderboard();
         if(document.getElementById('adminPage').classList.contains('active')) {
@@ -332,7 +243,8 @@
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
         db.ref('users/' + uniqueCode).set({
             name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
-            lastMass: 0, readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false
+            lastMass: 0, readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false,
+            lastSubmitTime: "لم يسجل بعد"
         }, (error) => {
             if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
@@ -346,14 +258,43 @@
             currentUserCode = code;
             showPage('dashboardPage');
             document.getElementById('userPoints').innerText = user.points;
-            // [تعديل] لو مسجل قبل كده، نعلم على الإصحاحات اللي اختارها تلقائياً
-            if(user.readDanChapters) {
-                let savedChs = user.readDanChapters.split(',');
-                document.querySelectorAll('.dan-ch').forEach(cb => {
-                    if(savedChs.includes(cb.value)) cb.checked = true;
-                });
-            }
+            applyLocks(user);
         } else { alert('Invalid Code or Password!'); }
+    }
+
+    // دالة لقفل المربعات المحفوظة مسبقاً لمنع التلاعب بالنقاط
+    function applyLocks(user) {
+        // قفل الإصحاحات المقروءة سابقاً
+        let savedChs = user.readDanChapters ? user.readDanChapters.split(',') : [];
+        document.querySelectorAll('.dan-ch').forEach(cb => {
+            if(savedChs.includes(cb.value)) {
+                cb.checked = true;
+                cb.disabled = true;
+                document.getElementById('lbl-dan-' + cb.value).classList.add('disabled-label');
+            } else {
+                cb.disabled = false;
+                document.getElementById('lbl-dan-' + cb.value).classList.remove('disabled-label');
+            }
+        });
+
+        // قفل الأجبية والكتب الروحية لليوم الحالي إذا تم تسجيلها
+        if(user.hasPrayed) {
+            document.getElementById('chkPray').checked = true;
+            document.getElementById('chkPray').disabled = true;
+            document.getElementById('lblPray').classList.add('disabled-label');
+        } else {
+            document.getElementById('chkPray').disabled = false;
+            document.getElementById('lblPray').classList.remove('disabled-label');
+        }
+
+        if(user.hasReadBooks) {
+            document.getElementById('chkBooks').checked = true;
+            document.getElementById('chkBooks').disabled = true;
+            document.getElementById('lblBooks').classList.add('disabled-label');
+        } else {
+            document.getElementById('chkBooks').disabled = false;
+            document.getElementById('lblBooks').classList.remove('disabled-label');
+        }
     }
 
     function submitProgress() {
@@ -361,49 +302,64 @@
         const user = globalUsers[currentUserCode];
         let addedPoints = 0;
 
-        // [تعديل] حساب نقاط الإصحاحات بناءً على الـ Checkboxes المحددة
-        let selectedChapters = [];
+        // استخراج الإصحاحات المحفوظة قديماً والإصحاحات الجديدة المحددة حالياً فقط
+        let oldChapters = user.readDanChapters ? user.readDanChapters.split(',') : [];
+        let newlySelectedChapters = [];
+        let allChapters = [...oldChapters];
+
         document.querySelectorAll('.dan-ch:checked').forEach(cb => {
-            selectedChapters.push(cb.value);
+            if(!oldChapters.includes(cb.value)) {
+                newlySelectedChapters.push(cb.value);
+                allChapters.push(cb.value);
+                addedPoints += 1; // نقطة لكل إصحاح جديد
+            }
         });
         
-        let danChCount = selectedChapters.length;
-        addedPoints += danChCount * 1; // نقطة لكل إصحاح
-        
         let danFinishedStatus = user.danFinished || false;
-        // لو علّم على الـ 12 كلهم وياخد بونص الـ 10 نقط
-        if (danChCount === 12 && !danFinishedStatus) {
+        // حساب البونص لو قفل الـ 12 كاملين
+        if (allChapters.length === 12 && !danFinishedStatus) {
             addedPoints += 10;
             danFinishedStatus = true;
-            alert("مبروك! أخذت 10 نقاط إضافية لإتمام سفر دانيال كاملاً (12 إصحاح) 📖");
-        } else if (danChCount < 12) {
-            danFinishedStatus = false;
+            alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط إضافية البونص 📖🎉");
         }
 
         let prayStatus = document.getElementById('chkPray').checked;
         let booksStatus = document.getElementById('chkBooks').checked;
         let confessStatus = document.getElementById('chkConfess').checked;
 
-        if(prayStatus) addedPoints += 2;
-        if(booksStatus) addedPoints += 2;
-        if(confessStatus) addedPoints += 10;
+        // إضافة النقاط للأنشطة الجديدة فقط (الغير مقفولة سابقاً)
+        if(prayStatus && !user.hasPrayed) addedPoints += 2;
+        if(booksStatus && !user.hasReadBooks) addedPoints += 2;
+        if(confessStatus && !user.hasConfessed) addedPoints += 10;
 
         const massValue = parseInt(document.getElementById('massCount').value);
         if(massValue === 1) addedPoints += 2;
         else if(massValue === 2) addedPoints += 5;
 
-        // [تعديل] حفظ كل التفاصيل للـ Firebase بالكامل عشان تروح للأدمن
+        if(addedPoints === 0 && massValue === user.lastMass) {
+            alert("لا توجد أنشطة جديدة لحفظها.");
+            return;
+        }
+
+        // جلب الوقت الحالي بالظبط بتوقيت مصر
+        let now = new Date();
+        let timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        let dateString = now.toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' });
+        let fullStamp = `${dateString} - الساعة ${timeString}`;
+
+        // رفع البيانات والتأكيدات للـ Firebase
         db.ref('users/' + currentUserCode).update({
             points: user.points + addedPoints,
             danFinished: danFinishedStatus,
             lastMass: massValue,
-            readDanChapters: selectedChapters.join(','),
+            readDanChapters: allChapters.join(''),
             hasPrayed: prayStatus,
             hasReadBooks: booksStatus,
-            hasConfessed: confessStatus
+            hasConfessed: confessStatus,
+            lastSubmitTime: fullStamp
         });
 
-        alert(`تم تحديث بياناتك بنجاح وإضافة ${addedPoints} نقطة! 🎉`);
+        alert(`تم تحديث بياناتك بنجاح! تم تسجيل الوقت: ${timeString}`);
     }
 
     function renderLeaderboard() {
@@ -419,14 +375,13 @@
         });
     }
 
-    // [تعديل شامل لجدول الأدمن] عشان يعرض علامات (✓) أو (✗) لكل الأنشطة بوضوح تام
     function renderAdminTable() {
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
         const userList = Object.values(globalUsers);
         
         if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7">No users registered yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8">No users registered yet.</td></tr>`;
             return;
         }
         
@@ -435,12 +390,13 @@
             if(user.lastMass === 1) massText = "قداس (2ن)";
             if(user.lastMass === 2) massText = "قداسين+ (5ن)";
 
-            let danText = user.readDanChapters ? `إصحاح (${user.readDanChapters})` : "❌";
+            let danText = user.readDanChapters ? `إصحاحات (${user.readDanChapters.split('').join(',')})` : "❌";
             if(user.danFinished) danText = "👑 كامل";
 
             let prayText = user.hasPrayed ? "✅" : "❌";
             let booksText = user.hasReadBooks ? "✅" : "❌";
             let confessText = user.hasConfessed ? "✅" : "❌";
+            let submitTime = user.lastSubmitTime || "لم يسجل بعد";
 
             tbody.innerHTML += `<tr>
                 <td><strong style="color:#fff;">${user.name}</strong><br><small style="color:var(--text-muted);">${user.code}</small></td>
@@ -449,6 +405,7 @@
                 <td class="status-icon">${booksText}</td>
                 <td class="status-icon">${confessText}</td>
                 <td style="color:#00bfff; font-size:12px;">${massText}</td>
+                <td style="color:#e65c00; font-size:11px; font-weight:600;">${submitTime}</td>
                 <td style="color:var(--admin-color); font-weight:bold;">${user.points}ن</td>
             </tr>`;
         });
