@@ -40,7 +40,7 @@
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 650px; /* كبرنا العرض شوية عشان جدول الأدمن الجديد */
             background: rgba(21, 16, 42, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -52,46 +52,19 @@
             overflow: hidden;
         }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: -50px;
-            width: 150px;
-            height: 150px;
-            background: var(--primary-glow);
-            filter: blur(90px);
-            opacity: 0.3;
-            z-index: 0;
-            pointer-events: none;
-        }
-
         h2, h3 {
             text-align: center;
             color: #fff;
             font-weight: 800;
             margin-top: 10px;
             letter-spacing: 0.5px;
-            text-shadow: 0 2px 10px rgba(255,255,255,0.1);
         }
         
         h2 { font-size: 28px; background: linear-gradient(to left, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { text-align: center; color: var(--text-muted); font-size: 14px; }
 
-        p { text-align: center; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #c9c4e6;
-        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #c9c4e6; }
 
         input[type="text"], input[type="password"], select {
             width: 100%;
@@ -102,17 +75,6 @@
             color: #fff;
             font-size: 15px;
             outline: none;
-        }
-
-        input[type="text"]:focus, input[type="password"]:focus, select:focus {
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 12px rgba(138, 43, 226, 0.4);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        select option {
-            background: #15102a;
-            color: #fff;
         }
 
         button {
@@ -127,181 +89,68 @@
             cursor: pointer;
             margin-top: 12px;
             box-shadow: 0 4px 15px rgba(255, 0, 128, 0.25);
-            position: relative;
-            z-index: 1;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 0, 128, 0.4);
-            opacity: 0.95;
-        }
+        button:hover { transform: translateY(-2px); opacity: 0.95; }
+        .btn-secondary { background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%); }
+        .btn-success { background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%); margin: 20px auto 10px auto; display: block; }
         
-        button:active { transform: translateY(1px); }
+        .btn-admin-top { position: absolute; top: 20px; left: 20px; width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 20px; }
 
-        .btn-secondary {
-            background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%);
-            box-shadow: 0 4px 15px rgba(18, 194, 233, 0.25);
-        }
-        .btn-secondary:hover { box-shadow: 0 6px 20px rgba(18, 194, 233, 0.4); }
-
-        .btn-success {
-            background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%);
-            width: auto;
-            padding: 12px 28px;
-            margin: 20px auto 10px auto;
-            display: block;
-            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.25);
-        }
-        .btn-success:hover { box-shadow: 0 6px 20px rgba(0, 176, 155, 0.4); }
-        
-        .btn-admin-top {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: auto;
-            padding: 6px 12px;
-            font-size: 11px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            border: 1px solid var(--card-border);
-            margin-top: 0;
-            box-shadow: none;
-            border-radius: 20px;
-        }
-        .btn-admin-top:hover {
-            background: rgba(255, 145, 0, 0.15);
-            color: var(--admin-color);
-            border-color: var(--admin-color);
-            box-shadow: none;
-        }
-
-        .page { display: none; position: relative; z-index: 1; }
+        .page { display: none; }
         .active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .code-display { background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(255, 0, 128, 0.4); padding: 18px; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 800; color: #ff0080; }
+        .points-badge { text-align: center; font-size: 18px; font-weight: 700; margin: 20px 0; padding: 14px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.2); color: var(--success-color); border-radius: 14px; }
+        .points-badge span { font-size: 24px; font-weight: 800; }
 
-        .code-display {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 0, 128, 0.4);
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 26px;
-            font-weight: 800;
-            margin: 20px 0;
-            color: #ff0080;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255,0,128,0.2);
-        }
+        .task-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: 16px; margin-bottom: 16px; }
+        .task-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 
-        .points-badge {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            margin: 20px 0;
-            padding: 14px;
-            background: rgba(0, 230, 118, 0.1);
-            border: 1px solid rgba(0, 230, 118, 0.2);
-            color: var(--success-color);
-            border-radius: 14px;
-            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.05);
+        /* تقسيم شبكة الإصحاحات */
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
         }
-        .points-badge span { font-size: 24px; font-weight: 800; vertical-align: middle; margin: 0 4px; }
-
-        .task-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 18px;
-            border-radius: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .task-card label { font-size: 15px; color: #fff; }
-
-        .task-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .task-row:last-child { margin-bottom: 0; }
 
         .checkbox-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             cursor: pointer;
             user-select: none;
-            width: 100%;
         }
         
         .checkbox-container input {
             appearance: none;
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 2px solid var(--card-border);
-            border-radius: 6px;
+            border-radius: 5px;
             background: rgba(255,255,255,0.02);
             display: grid;
             place-content: center;
             cursor: pointer;
         }
-        .checkbox-container input::before {
-            content: "✓";
-            font-size: 14px;
-            font-weight: bold;
-            color: #fff;
-            transform: scale(0);
-            transition: 0.1s transform ease-in-out;
-        }
-        .checkbox-container input:checked {
-            background: var(--primary-glow);
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 8px rgba(138, 43, 226, 0.5);
-        }
+        .checkbox-container input::before { content: "✓"; font-size: 12px; font-weight: bold; color: #fff; transform: scale(0); }
+        .checkbox-container input:checked { background: var(--primary-glow); border-color: var(--primary-glow); }
         .checkbox-container input:checked::before { transform: scale(1); }
 
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 20px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--card-border);
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        th {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            font-weight: 700;
-        }
-        
-        td {
-            background: rgba(255, 255, 255, 0.02);
-            border-top: 1px solid var(--card-border);
-            color: #e1def2;
-        }
-        
-        tr:hover td { background: rgba(255,255,255,0.05); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); }
+        th, td { padding: 10px; text-align: center; font-size: 13px; }
+        th { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        td { background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--card-border); color: #e1def2; }
 
         .nav-links { text-align: center; margin-top: 20px; }
-        .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .nav-links a:hover { text-decoration: underline; }
-        
+        .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
         hr { border: 0; border-top: 1px solid var(--card-border); margin: 15px 0; }
+        
+        .status-icon { font-size: 16px; }
     </style>
 </head>
 <body>
@@ -309,7 +158,7 @@
 <div class="container">
     <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
 
-    <!-- صفحة الترحيب الرئيسية بالكامل بالإنجليزي -->
+    <!-- صفحة الترحيب -->
     <div id="welcomePage" class="page active">
         <h2 style="margin-top: 40px; margin-bottom: 5px;">Khelwaty</h2>
         <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
@@ -317,10 +166,9 @@
         <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
     </div>
 
-    <!-- صفحة إنشاء حساب بالإنجليزي -->
+    <!-- صفحة إنشاء حساب -->
     <div id="registerPage" class="page">
         <h2>Create Account</h2>
-        <p>Join us on your daily spiritual journey</p>
         <div class="form-group" style="margin-top: 20px;">
             <label>Full Name:</label>
             <input type="text" id="regName" placeholder="Enter your name">
@@ -333,18 +181,16 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- صفحة ظهور الكود بالإنجليزي -->
+    <!-- صفحة ظهور الكود -->
     <div id="codePage" class="page">
         <h2>Account Created! 🎉</h2>
-        <p>Please save your unique code (take a screenshot). You cannot login without it:</p>
         <div class="code-display" id="generatedCode"></div>
         <button onclick="showPage('loginPage')">Go to Login</button>
     </div>
 
-    <!-- صفحة تسجيل الدخول بالإنجليزي -->
+    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="page">
         <h2>Login</h2>
-        <p>Enter your credentials to access your dashboard</p>
         <div class="form-group" style="margin-top: 20px;">
             <label>Your Unique Code:</label>
             <input type="text" id="loginCode" placeholder="e.g., M-1234">
@@ -357,27 +203,30 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- لوحة التحكم من الداخل بالعربي بالكامل -->
+    <!-- لوحة التحكم من الداخل (بالعربي) -->
     <div id="dashboardPage" class="page">
-        <h3 style="margin-bottom: 5px;">خلوتك الروحية اليومية 🌟</h3>
-        <div class="points-badge">
-            مجموع نقاطك: <span id="userPoints">0</span> نقطة
-        </div>
+        <h3>خلوتك الروحية اليومية 🌟</h3>
+        <div class="points-badge">مجموع نقاطك: <span id="userPoints">0</span> نقطة</div>
 
+        <!-- [تعديل] تحويل سفر دانيال لمربعات اختيار متعددة -->
         <div class="task-card">
             <label>📖 قراءة سفر دانيال (النبي):</label>
-            <!-- [تعديل] تغيير التنبيه ليكون 12 إصحاح -->
-            <span class="hint">كل إصحاح بـ 1 نقطة. عند إتمام السفر كاملاً (12 إصحاح) هتاخد 10 نقط إضافية تلقائياً!</span>
-            <div class="task-row" style="margin-top: 14px;">
-                <span style="font-size: 14px; color: #c9c4e6;">حدد عدد الإصحاحات اليوم:</span>
-                <!-- [تعديل] قفل الخيارات عند إصحاح 12 وعمل السفر كامل عنده -->
-                <select id="danChapters" style="width: auto; padding: 8px 12px;">
-                    <option value="0">0</option>
-                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
-                    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
-                    <option value="10">10</option><option value="11">11</option><option value="12">12 (السفر كامل)</option>
-                </select>
+            <span class="hint">علّم على كل إصحاح قريته (الإصحاح بـ 1 نقطة). لو قريت الـ 12 كلهم هتاخد 10 نقط زيادة!</span>
+            
+            <div class="chapters-grid">
+                <!-- صنعنا 12 تشيك بوكس لكل إصحاح بشكل منفصل -->
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="1"><span>اصحاح 1</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="2"><span>اصحاح 2</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="3"><span>اصحاح 3</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="4"><span>اصحاح 4</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="5"><span>اصحاح 5</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="6"><span>اصحاح 6</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="7"><span>اصحاح 7</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="8"><span>اصحاح 8</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="9"><span>اصحاح 9</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="10"><span>اصحاح 10</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="11"><span>اصحاح 11</span></label>
+                <label class="checkbox-container"><input type="checkbox" class="dan-ch" value="12"><span>اصحاح 12</span></label>
             </div>
         </div>
 
@@ -399,7 +248,7 @@
 
         <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الأسبوعية</button>
         <hr style="margin: 25px 0;">
-        <h3 style="font-size: 20px;">لوحة الصدارة والترتيب 🏆</h3>
+        <h3>لوحة الصدارة والترتيب 🏆</h3>
         <table>
             <thead><tr><th>الترتيب</th><th>الكود المخصوص</th><th>إجمالي النقاط</th></tr></thead>
             <tbody id="leaderboardBody"></tbody>
@@ -407,18 +256,20 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- صفحة الأدمن السري بالعربي [تعديل الأعمدة لعرض التفاصيل] -->
+    <!-- [تعديل كامل] صفحة الأدمن لعرض كل الأنشطة بالكامل (أجبية، اعتراف، كتب، دانيال، قداس) -->
     <div id="adminPage" class="page">
         <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم الخادم 👑</h2>
         <div style="overflow-x: auto; width: 100%;">
             <table>
                 <thead>
                     <tr>
-                        <th>الاسم الحقيقي</th>
-                        <th>الكود</th>
-                        <th>آخر قراءة للقداس</th>
-                        <th>إصحاحات دانيال</th>
-                        <th>إجمالي النقاط</th>
+                        <th>الاسم</th>
+                        <th>دانيال</th>
+                        <th>أجبية</th>
+                        <th>كتب</th>
+                        <th>اعتراف</th>
+                        <th>القداس</th>
+                        <th>النقاط</th>
                     </tr>
                 </thead>
                 <tbody id="adminTableBody"></tbody>
@@ -444,8 +295,6 @@
 
     let globalUsers = {};
     let currentUserCode = null;
-    
-    // 🔐 باسورد الأدمن الخاص بيك
     const ADMIN_PASSWORD = "Foshy2026#"; 
 
     db.ref('users').on('value', (snapshot) => {
@@ -454,7 +303,6 @@
             document.getElementById('userPoints').innerText = globalUsers[currentUserCode].points;
         }
         renderLeaderboard();
-        // تحديث جدول الأدمن تلقائياً لو الصفحة مفتوحة
         if(document.getElementById('adminPage').classList.contains('active')) {
             renderAdminTable();
         }
@@ -479,46 +327,33 @@
     function handleRegister() {
         const name = document.getElementById('regName').value.trim();
         const password = document.getElementById('regPassword').value.trim();
-
-        if(!name || password.length < 4) {
-            alert('Please fill all fields correctly.');
-            return;
-        }
+        if(!name || password.length < 4) { alert('Please fill all fields correctly.'); return; }
 
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
-        
         db.ref('users/' + uniqueCode).set({
-            name: name,
-            password: password,
-            code: uniqueCode,
-            points: 0,
-            danFinished: false,
-            lastMass: 0,       // [تعديل] إضافة حقول حفظ تفاصيل الأنشطة بالـ Firebase
-            lastChapters: 0
+            name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
+            lastMass: 0, readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false
         }, (error) => {
-            if(!error) {
-                document.getElementById('generatedCode').innerText = uniqueCode;
-                showPage('codePage');
-                document.getElementById('regName').value = '';
-                document.getElementById('regPassword').value = '';
-            }
+            if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
     }
 
     function handleLogin() {
         const code = document.getElementById('loginCode').value.trim().toUpperCase();
         const pass = document.getElementById('loginPassword').value.trim();
-        
         const user = globalUsers[code];
-
         if(user && user.password === pass) {
             currentUserCode = code;
             showPage('dashboardPage');
             document.getElementById('userPoints').innerText = user.points;
-            renderLeaderboard();
-        } else {
-            alert('Invalid Code or Password!');
-        }
+            // [تعديل] لو مسجل قبل كده، نعلم على الإصحاحات اللي اختارها تلقائياً
+            if(user.readDanChapters) {
+                let savedChs = user.readDanChapters.split(',');
+                document.querySelectorAll('.dan-ch').forEach(cb => {
+                    if(savedChs.includes(cb.value)) cb.checked = true;
+                });
+            }
+        } else { alert('Invalid Code or Password!'); }
     }
 
     function submitProgress() {
@@ -526,47 +361,49 @@
         const user = globalUsers[currentUserCode];
         let addedPoints = 0;
 
-        const danCh = parseInt(document.getElementById('danChapters').value);
-        addedPoints += danCh * 1;
+        // [تعديل] حساب نقاط الإصحاحات بناءً على الـ Checkboxes المحددة
+        let selectedChapters = [];
+        document.querySelectorAll('.dan-ch:checked').forEach(cb => {
+            selectedChapters.push(cb.value);
+        });
+        
+        let danChCount = selectedChapters.length;
+        addedPoints += danChCount * 1; // نقطة لكل إصحاح
         
         let danFinishedStatus = user.danFinished || false;
-        // [تعديل] حساب مكافأة الـ 10 نقط عند إتمام 12 إصحاحاً بدلاً من 14
-        if (danCh === 12 && !danFinishedStatus) {
+        // لو علّم على الـ 12 كلهم وياخد بونص الـ 10 نقط
+        if (danChCount === 12 && !danFinishedStatus) {
             addedPoints += 10;
             danFinishedStatus = true;
             alert("مبروك! أخذت 10 نقاط إضافية لإتمام سفر دانيال كاملاً (12 إصحاح) 📖");
-        } else if (danCh < 12) {
+        } else if (danChCount < 12) {
             danFinishedStatus = false;
         }
 
-        if(document.getElementById('chkPray').checked) addedPoints += 2;
-        if(document.getElementById('chkBooks').checked) addedPoints += 2;
-        if(document.getElementById('chkConfess').checked) addedPoints += 10;
+        let prayStatus = document.getElementById('chkPray').checked;
+        let booksStatus = document.getElementById('chkBooks').checked;
+        let confessStatus = document.getElementById('chkConfess').checked;
+
+        if(prayStatus) addedPoints += 2;
+        if(booksStatus) addedPoints += 2;
+        if(confessStatus) addedPoints += 10;
 
         const massValue = parseInt(document.getElementById('massCount').value);
         if(massValue === 1) addedPoints += 2;
         else if(massValue === 2) addedPoints += 5;
 
-        if(addedPoints === 0) {
-            alert("قم بتحديد الأنشطة أولاً.");
-            return;
-        }
-
-        // [تعديل] رفع التفاصيل للسيرفر مع تجميع النقاط عشان تظهر للأدمن
+        // [تعديل] حفظ كل التفاصيل للـ Firebase بالكامل عشان تروح للأدمن
         db.ref('users/' + currentUserCode).update({
             points: user.points + addedPoints,
             danFinished: danFinishedStatus,
             lastMass: massValue,
-            lastChapters: danCh
+            readDanChapters: selectedChapters.join(','),
+            hasPrayed: prayStatus,
+            hasReadBooks: booksStatus,
+            hasConfessed: confessStatus
         });
 
-        alert(`تم إضافة ${addedPoints} نقطة بنجاح والتسجيل على السيرفر ☁️`);
-        
-        document.getElementById('danChapters').value = "0";
-        document.getElementById('chkPray').checked = false;
-        document.getElementById('chkBooks').checked = false;
-        document.getElementById('chkConfess').checked = false;
-        document.getElementById('massCount').value = "0";
+        alert(`تم تحديث بياناتك بنجاح وإضافة ${addedPoints} نقطة! 🎉`);
     }
 
     function renderLeaderboard() {
@@ -574,52 +411,50 @@
         const tbody = document.getElementById('leaderboardBody');
         tbody.innerHTML = '';
         userList.forEach((user, index) => {
-            const row = `<tr>
-                <td style="font-weight: bold; color: ${index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'inherit'}">${index + 1}</td>
-                <td>${user.code} ${user.code === currentUserCode ? '<span style="color:var(--secondary-glow); font-weight:bold;">(أنت)</span>' : ''}</td>
-                <td style="color: var(--success-color); font-weight: bold;">${user.points}</td>
+            tbody.innerHTML += `<tr>
+                <td style="font-weight:bold; color:${index===0?'#ffd700':index===1?'#c0c0c0':'#cd7f32'}">${index + 1}</td>
+                <td>${user.code} ${user.code === currentUserCode ? '<span style="color:var(--secondary-glow);">(أنت)</span>' : ''}</td>
+                <td style="color:var(--success-color); font-weight:bold;">${user.points}</td>
             </tr>`;
-            tbody.innerHTML += row;
         });
     }
 
-    // [تعديل كامل للدالة] لعرض كل مخدوم عمل إيه بالظبط بالتفصيل للأدمن
+    // [تعديل شامل لجدول الأدمن] عشان يعرض علامات (✓) أو (✗) لكل الأنشطة بوضوح تام
     function renderAdminTable() {
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
         const userList = Object.values(globalUsers);
+        
         if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5">No users registered yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7">No users registered yet.</td></tr>`;
             return;
         }
+        
         userList.forEach((user) => {
-            // تحويل قيم القداس لنصوص واضحة
-            let massText = "لم يحضر";
-            if(user.lastMass === 1) massText = "قداس واحد (2ن)";
-            else if(user.lastMass === 2) massText = "قداسين+ (5ن)";
+            let massText = "❌";
+            if(user.lastMass === 1) massText = "قداس (2ن)";
+            if(user.lastMass === 2) massText = "قداسين+ (5ن)";
 
-            // عرض عدد الإصحاحات المقروءة
-            let chaptersText = user.lastChapters ? `${user.lastChapters} إصحاح` : "0 إصحاح";
-            if(user.danFinished) chaptersText += " 👑 (تم السفر)";
+            let danText = user.readDanChapters ? `إصحاح (${user.readDanChapters})` : "❌";
+            if(user.danFinished) danText = "👑 كامل";
 
-            const row = `<tr>
-                <td><strong style="color: #fff;">${user.name}</strong></td>
-                <td><span style="color: var(--text-muted);">${user.code}</span></td>
-                <td style="color: #00bfff;">${massText}</td>
-                <td style="color: #c471ed;">${chaptersText}</td>
-                <td style="color: var(--admin-color); font-weight: bold;">${user.points} نقطة</td>
+            let prayText = user.hasPrayed ? "✅" : "❌";
+            let booksText = user.hasReadBooks ? "✅" : "❌";
+            let confessText = user.hasConfessed ? "✅" : "❌";
+
+            tbody.innerHTML += `<tr>
+                <td><strong style="color:#fff;">${user.name}</strong><br><small style="color:var(--text-muted);">${user.code}</small></td>
+                <td style="color:#c471ed; font-size:11px; max-width:110px; word-wrap:break-word;">${danText}</td>
+                <td class="status-icon">${prayText}</td>
+                <td class="status-icon">${booksText}</td>
+                <td class="status-icon">${confessText}</td>
+                <td style="color:#00bfff; font-size:12px;">${massText}</td>
+                <td style="color:var(--admin-color); font-weight:bold;">${user.points}ن</td>
             </tr>`;
-            tbody.innerHTML += row;
         });
     }
 
-    function logout() {
-        currentUserCode = null;
-        document.getElementById('loginCode').value = '';
-        document.getElementById('loginPassword').value = '';
-        showPage('welcomePage');
-    }
+    function logout() { currentUserCode = null; showPage('welcomePage'); }
 </script>
 </body>
 </html>
-
