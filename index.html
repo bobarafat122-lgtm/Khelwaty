@@ -22,7 +22,7 @@
         
         * { box-sizing: border-box; transition: all 0.3s ease; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg-gradient); min-height: 100vh; margin: 0; padding: 20px 15px; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
-        .container { width: 100%; max-width: 750px; background: rgba(21, 16, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid var(--card-border); padding: 30px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); position: relative; overflow: hidden; }
+        .container { width: 100%; max-width: 850px; background: rgba(21, 16, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid var(--card-border); padding: 30px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); position: relative; overflow: hidden; }
         h2, h3 { text-align: center; color: #fff; font-weight: 800; margin-top: 10px; }
         h2 { font-size: 28px; background: linear-gradient(to left, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         p { text-align: center; color: var(--text-muted); font-size: 14px; }
@@ -49,7 +49,6 @@
         .checkbox-container input:checked { background: var(--primary-glow); border-color: var(--primary-glow); }
         .checkbox-container input:checked::before { transform: scale(1); }
         
-        /* شكل العناصر المقفولة والمحفوظة سابقاً */
         .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; cursor: not-allowed; }
         .checkbox-container input:disabled::before { color: #888 !important; }
         .disabled-label { color: #666 !important; cursor: not-allowed; }
@@ -142,9 +141,9 @@
         <div class="task-card">
             <label>⚙️ الأنشطة والوسائط الروحية الأخرى:</label>
             <hr>
-            <div class="task-row"><label class="checkbox-container" id="lblPray"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة/مرة واحدة باليوم)</span></label></div>
-            <div class="task-row"><label class="checkbox-container" id="lblBooks"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة/مرة واحدة باليوم)</span></label></div>
-            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
+            <div class="task-row"><label class="checkbox-container" id="lblPray"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة)</span></label></div>
+            <div class="task-row"><label class="checkbox-container" id="lblBooks"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة)</span></label></div>
+            <div class="task-row"><label class="checkbox-container" id="lblConfess"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
             <div class="task-row" style="margin-top: 10px;">
                 <span style="font-size: 14px; color: #c9c4e6;">حضور القداسات الإلهية:</span>
                 <select id="massCount" style="width: auto; padding: 8px 12px;">
@@ -155,7 +154,7 @@
             </div>
         </div>
 
-        <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الأسبوعية</button>
+        <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الروحية</button>
         <hr style="margin: 25px 0;">
         <h3>لوحة الصدارة والترتيب 🏆</h3>
         <table>
@@ -165,21 +164,21 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- صفحة الأدمن المعدلة بالكامل لعرض تواريخ وساعات التحديث -->
+    <!-- صفحة الأدمن المحدثة بسجل تاريخي كامل يوم بيوم وساعة بساعة -->
     <div id="adminPage" class="page">
-        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم الخادم 👑</h2>
+        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">سجل متابعة المخدومين اليومي 👑</h2>
         <div style="overflow-x: auto; width: 100%;">
             <table>
                 <thead>
                     <tr>
-                        <th>الاسم</th>
-                        <th>دانيال</th>
+                        <th>الاسم والكود</th>
+                        <th>التاريخ والوقت ⏰</th>
+                        <th>دانيال الجديد</th>
                         <th>أجبية</th>
-                        <th>كتب</th>
+                        <th>كتب روحية</th>
                         <th>اعتراف</th>
                         <th>القداس</th>
-                        <th>وقت التسجيل ⏰</th>
-                        <th>النقاط</th>
+                        <th>إجمالي النقاط الحالي</th>
                     </tr>
                 </thead>
                 <tbody id="adminTableBody"></tbody>
@@ -205,7 +204,7 @@
 
     let globalUsers = {};
     let currentUserCode = null;
-    const ADMIN_PASSWORD = "Foshy2026#"; 
+    const ADMIN_PASSWORD = "Foshy2026#"; // باسورد الأدمن في السطر 200 بالظبط!
 
     db.ref('users').on('value', (snapshot) => {
         globalUsers = snapshot.val() || {};
@@ -214,9 +213,6 @@
             applyLocks(globalUsers[currentUserCode]);
         }
         renderLeaderboard();
-        if(document.getElementById('adminPage').classList.contains('active')) {
-            renderAdminTable();
-        }
     });
 
     function showPage(pageId) {
@@ -243,8 +239,7 @@
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
         db.ref('users/' + uniqueCode).set({
             name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
-            lastMass: 0, readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false,
-            lastSubmitTime: "لم يسجل بعد"
+            readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false
         }, (error) => {
             if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
@@ -262,9 +257,7 @@
         } else { alert('Invalid Code or Password!'); }
     }
 
-    // دالة لقفل المربعات المحفوظة مسبقاً لمنع التلاعب بالنقاط
     function applyLocks(user) {
-        // قفل الإصحاحات المقروءة سابقاً
         let savedChs = user.readDanChapters ? user.readDanChapters.split(',') : [];
         document.querySelectorAll('.dan-ch').forEach(cb => {
             if(savedChs.includes(cb.value)) {
@@ -277,24 +270,11 @@
             }
         });
 
-        // قفل الأجبية والكتب الروحية لليوم الحالي إذا تم تسجيلها
-        if(user.hasPrayed) {
-            document.getElementById('chkPray').checked = true;
-            document.getElementById('chkPray').disabled = true;
-            document.getElementById('lblPray').classList.add('disabled-label');
-        } else {
-            document.getElementById('chkPray').disabled = false;
-            document.getElementById('lblPray').classList.remove('disabled-label');
-        }
-
-        if(user.hasReadBooks) {
-            document.getElementById('chkBooks').checked = true;
-            document.getElementById('chkBooks').disabled = true;
-            document.getElementById('lblBooks').classList.add('disabled-label');
-        } else {
-            document.getElementById('chkBooks').disabled = false;
-            document.getElementById('lblBooks').classList.remove('disabled-label');
-        }
+        // ريست لشاشات الاختيار عشان يسجل اليوم الجديد براحته
+        document.getElementById('chkPray').checked = false;
+        document.getElementById('chkBooks').checked = false;
+        document.getElementById('chkConfess').checked = false;
+        document.getElementById('massCount').value = "0";
     }
 
     function submitProgress() {
@@ -302,7 +282,6 @@
         const user = globalUsers[currentUserCode];
         let addedPoints = 0;
 
-        // استخراج الإصحاحات المحفوظة قديماً والإصحاحات الجديدة المحددة حالياً فقط
         let oldChapters = user.readDanChapters ? user.readDanChapters.split(',') : [];
         let newlySelectedChapters = [];
         let allChapters = [...oldChapters];
@@ -311,55 +290,62 @@
             if(!oldChapters.includes(cb.value)) {
                 newlySelectedChapters.push(cb.value);
                 allChapters.push(cb.value);
-                addedPoints += 1; // نقطة لكل إصحاح جديد
+                addedPoints += 1;
             }
         });
         
         let danFinishedStatus = user.danFinished || false;
-        // حساب البونص لو قفل الـ 12 كاملين
         if (allChapters.length === 12 && !danFinishedStatus) {
             addedPoints += 10;
             danFinishedStatus = true;
-            alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط إضافية البونص 📖🎉");
+            alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط بونص 📖🎉");
         }
 
         let prayStatus = document.getElementById('chkPray').checked;
         let booksStatus = document.getElementById('chkBooks').checked;
         let confessStatus = document.getElementById('chkConfess').checked;
 
-        // إضافة النقاط للأنشطة الجديدة فقط (الغير مقفولة سابقاً)
-        if(prayStatus && !user.hasPrayed) addedPoints += 2;
-        if(booksStatus && !user.hasReadBooks) addedPoints += 2;
-        if(confessStatus && !user.hasConfessed) addedPoints += 10;
+        if(prayStatus) addedPoints += 2;
+        if(booksStatus) addedPoints += 2;
+        if(confessStatus) addedPoints += 10;
 
         const massValue = parseInt(document.getElementById('massCount').value);
         if(massValue === 1) addedPoints += 2;
         else if(massValue === 2) addedPoints += 5;
 
-        if(addedPoints === 0 && massValue === user.lastMass) {
+        if(addedPoints === 0 && massValue === 0) {
             alert("لا توجد أنشطة جديدة لحفظها.");
             return;
         }
 
-        // جلب الوقت الحالي بالظبط بتوقيت مصر
         let now = new Date();
         let timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         let dateString = now.toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' });
         let fullStamp = `${dateString} - الساعة ${timeString}`;
 
-        // رفع البيانات والتأكيدات للـ Firebase
+        let newPoints = user.points + addedPoints;
+
+        // 1. تحديث الحساب الأساسي للمخدوم ونقاطه التراكمية والإصحاحات المقفولة
         db.ref('users/' + currentUserCode).update({
-            points: user.points + addedPoints,
+            points: newPoints,
             danFinished: danFinishedStatus,
-            lastMass: massValue,
-            readDanChapters: allChapters.join(''),
-            hasPrayed: prayStatus,
-            hasReadBooks: booksStatus,
-            hasConfessed: confessStatus,
-            lastSubmitTime: fullStamp
+            readDanChapters: allChapters.join(',')
         });
 
-        alert(`تم تحديث بياناتك بنجاح! تم تسجيل الوقت: ${timeString}`);
+        // 2. [التعديل السحري] حفظ الحركة دي في سجل تاريخي منفصل مبيتصلحش ولا بيتمسحش
+        db.ref('history_logs').push({
+            name: user.name,
+            code: user.code,
+            timestamp: fullStamp,
+            danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
+            prayed: prayStatus ? "✅" : "❌",
+            readBooks: booksStatus ? "✅" : "❌",
+            confessed: confessStatus ? "✅" : "❌",
+            mass: massValue === 1 ? "قداس" : massValue === 2 ? "قداسين+" : "❌",
+            currentTotalPoints: newPoints
+        });
+
+        alert(`تم حفظ أنشطتك بنجاح! تم تسجيل الوقت: ${timeString}`);
     }
 
     function renderLeaderboard() {
@@ -375,39 +361,32 @@
         });
     }
 
+    // جلب وعرض كل الحركات التاريخية ورا بعضها في لوحة الأدمن
     function renderAdminTable() {
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
-        const userList = Object.values(globalUsers);
         
-        if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8">No users registered yet.</td></tr>`;
-            return;
-        }
-        
-        userList.forEach((user) => {
-            let massText = "❌";
-            if(user.lastMass === 1) massText = "قداس (2ن)";
-            if(user.lastMass === 2) massText = "قداسين+ (5ن)";
-
-            let danText = user.readDanChapters ? `إصحاحات (${user.readDanChapters.split('').join(',')})` : "❌";
-            if(user.danFinished) danText = "👑 كامل";
-
-            let prayText = user.hasPrayed ? "✅" : "❌";
-            let booksText = user.hasReadBooks ? "✅" : "❌";
-            let confessText = user.hasConfessed ? "✅" : "❌";
-            let submitTime = user.lastSubmitTime || "لم يسجل بعد";
-
-            tbody.innerHTML += `<tr>
-                <td><strong style="color:#fff;">${user.name}</strong><br><small style="color:var(--text-muted);">${user.code}</small></td>
-                <td style="color:#c471ed; font-size:11px; max-width:110px; word-wrap:break-word;">${danText}</td>
-                <td class="status-icon">${prayText}</td>
-                <td class="status-icon">${booksText}</td>
-                <td class="status-icon">${confessText}</td>
-                <td style="color:#00bfff; font-size:12px;">${massText}</td>
-                <td style="color:#e65c00; font-size:11px; font-weight:600;">${submitTime}</td>
-                <td style="color:var(--admin-color); font-weight:bold;">${user.points}ن</td>
-            </tr>`;
+        db.ref('history_logs').once('value', (snapshot) => {
+            const logs = snapshot.val() || {};
+            const logList = Object.values(logs).reverse(); // يعرض الأحدث فوق
+            
+            if(logList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8">لم يقم أي مخدوم بتسجيل أنشطة بعد.</td></tr>`;
+                return;
+            }
+            
+            logList.forEach((log) => {
+                tbody.innerHTML += `<tr>
+                    <td><strong style="color:#fff;">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
+                    <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timestamp}</td>
+                    <td style="color:#c471ed; font-size:12px;">${log.danChapters}</td>
+                    <td>${log.prayed}</td>
+                    <td>${log.readBooks}</td>
+                    <td>${log.confessed}</td>
+                    <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
+                    <td style="color:var(--success-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
+                </tr>`;
+            });
         });
     }
 
