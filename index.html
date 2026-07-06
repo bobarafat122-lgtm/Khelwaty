@@ -270,7 +270,6 @@
             }
         });
 
-        // ريست لشاشات الاختيار عشان يسجل اليوم الجديد براحته
         document.getElementById('chkPray').checked = false;
         document.getElementById('chkBooks').checked = false;
         document.getElementById('chkConfess').checked = false;
@@ -325,14 +324,12 @@
 
         let newPoints = user.points + addedPoints;
 
-        // 1. تحديث الحساب الأساسي للمخدوم ونقاطه التراكمية والإصحاحات المقفولة
         db.ref('users/' + currentUserCode).update({
             points: newPoints,
             danFinished: danFinishedStatus,
             readDanChapters: allChapters.join(',')
         });
 
-        // 2. [التعديل السحري] حفظ الحركة دي في سجل تاريخي منفصل مبيتصلحش ولا بيتمسحش
         db.ref('history_logs').push({
             name: user.name,
             code: user.code,
@@ -361,14 +358,13 @@
         });
     }
 
-    // جلب وعرض كل الحركات التاريخية ورا بعضها في لوحة الأدمن
     function renderAdminTable() {
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
         
         db.ref('history_logs').once('value', (snapshot) => {
             const logs = snapshot.val() || {};
-            const logList = Object.values(logs).reverse(); // يعرض الأحدث فوق
+            const logList = Object.values(logs).reverse();
             
             if(logList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8">لم يقم أي مخدوم بتسجيل أنشطة بعد.</td></tr>`;
