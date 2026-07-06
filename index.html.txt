@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khelwaty - خلوتي</title>
+    <!-- استدعاء مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #15102a 100%);
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --primary-glow: #8a2be2;
+            --secondary-glow: #00bfff;
+            --text-main: #f3f1f9;
+            --text-muted: #a49fc6;
+            --success-color: #00e676;
+            --admin-color: #ff9100;
+        }
+        
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(21, 16, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            padding: 30px 24px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 40px rgba(138, 43, 226, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* توهج خلفي خفيف وحركة */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: var(--primary-glow);
+            filter: blur(90px);
+            opacity: 0.3;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #fff;
+            font-weight: 800;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.1);
+        }
+        
+        h2 { font-size: 28px; background: linear-gradient(to left, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        p { text-align: center; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #c9c4e6;
+        }
+
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 12px rgba(138, 43, 226, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        select option {
+            background: #15102a;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.25);
+            position: relative;
+            z-index: 1;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 128, 0.4);
+            opacity: 0.95;
+        }
+        
+        button:active { transform: translateY(1px); }
+
+        .btn-secondary {
+            background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%);
+            box-shadow: 0 4px 15px rgba(18, 194, 233, 0.25);
+        }
+        .btn-secondary:hover { box-shadow: 0 6px 20px rgba(18, 194, 233, 0.4); }
+
+        .btn-success {
+            background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%);
+            width: auto;
+            padding: 12px 28px;
+            margin: 20px auto 10px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.25);
+        }
+        .btn-success:hover { box-shadow: 0 6px 20px rgba(0, 176, 155, 0.4); }
+        
+        .btn-admin-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: auto;
+            padding: 6px 12px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            margin-top: 0;
+            box-shadow: none;
+            border-radius: 20px;
+        }
+        .btn-admin-top:hover {
+            background: rgba(255, 145, 0, 0.15);
+            color: var(--admin-color);
+            border-color: var(--admin-color);
+            box-shadow: none;
+        }
+
+        .page { display: none; position: relative; z-index: 1; }
+        .active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 0, 128, 0.4);
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            margin: 20px 0;
+            color: #ff0080;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,0,128,0.2);
+        }
+
+        .points-badge {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0;
+            padding: 14px;
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid rgba(0, 230, 118, 0.2);
+            color: var(--success-color);
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.05);
+        }
+        .points-badge span { font-size: 24px; font-weight: 800; vertical-align: middle; margin: 0 4px; }
+
+        .task-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .task-card label { font-size: 15px; color: #fff; }
+
+        .task-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .task-row:last-child { margin-bottom: 0; }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+            width: 100%;
+        }
+        
+        .checkbox-container input {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--card-border);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.02);
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+        }
+        .checkbox-container input::before {
+            content: "✓";
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            transform: scale(0);
+            transition: 0.1s transform ease-in-out;
+        }
+        .checkbox-container input:checked {
+            background: var(--primary-glow);
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 8px rgba(138, 43, 226, 0.5);
+        }
+        .checkbox-container input:checked::before { transform: scale(1); }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-weight: 700;
+        }
+        
+        td {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--card-border);
+            color: #e1def2;
+        }
+        
+        tr:hover td { background: rgba(255,255,255,0.05); }
+
+        .nav-links { text-align: center; margin-top: 20px; }
+        .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .nav-links a:hover { text-decoration: underline; }
+        
+        .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
+        hr { border: 0; border-top: 1px solid var(--card-border); margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
+
+    <!-- صفحة الترحيب الرئيسية بالكامل بالإنجليزي -->
+    <div id="welcomePage" class="page active">
+        <h2 style="margin-top: 40px; margin-bottom: 5px;">Khelwaty</h2>
+        <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
+        <button onclick="showPage('loginPage')">Login</button>
+        <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
+    </div>
+
+    <!-- صفحة إنشاء حساب بالإنجليزي -->
+    <div id="registerPage" class="page">
+        <h2>Create Account</h2>
+        <p>Join us on your daily spiritual journey</p>
+        <div class="form-group" style="margin-top: 20px;">
+            <label>Full Name:</label>
+            <input type="text" id="regName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+            <label>Password (4-6 digits):</label>
+            <input type="password" id="regPassword" maxlength="6" placeholder="****">
+        </div>
+        <button onclick="handleRegister()">Register & Get Code</button>
+        <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
+    </div>
+
+    <!-- صفحة ظهور الكود بالإنجليزي -->
+    <div id="codePage" class="page">
+        <h2>Account Created! 🎉</h2>
+        <p>Please save your unique code (take a screenshot). You cannot login without it:</p>
+        <div class="code-display" id="generatedCode"></div>
+        <button onclick="showPage('loginPage')">Go to Login</button>
+    </div>
+
+    <!-- صفحة تسجيل الدخول بالإنجليزي -->
+    <div id="loginPage" class="page">
+        <h2>Login</h2>
+        <p>Enter your credentials to access your dashboard</p>
+        <div class="form-group" style="margin-top: 20px;">
+            <label>Your Unique Code:</label>
+            <input type="text" id="loginCode" placeholder="e.g., M-1234">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="loginPassword" placeholder="****">
+        </div>
+        <button onclick="handleLogin()">Sign In</button>
+        <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
+    </div>
+
+    <!-- لوحة التحكم من الداخل بالعربي بالكامل -->
+    <div id="dashboardPage" class="page">
+        <h3 style="margin-bottom: 5px;">خلوتك الروحية اليومية 🌟</h3>
+        <div class="points-badge">
+            مجموع نقاطك: <span id="userPoints">0</span> نقطة
+        </div>
+
+        <div class="task-card">
+            <label>📖 قراءة سفر دانيال (النبي):</label>
+            <span class="hint">كل إصحاح بـ 1 نقطة. عند إتمام السفر كاملاً هتاخد 10 نقط إضافية تلقائياً!</span>
+            <div class="task-row" style="margin-top: 14px;">
+                <span style="font-size: 14px; color: #c9c4e6;">حدد عدد الإصحاحات اليوم:</span>
+                <select id="danChapters" style="width: auto; padding: 8px 12px;">
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    <option value="13">13</option><option value="14">14 (السفر كامل)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="task-card">
+            <label>⚙️ الأنشطة والوسائط الروحية الأخرى:</label>
+            <hr>
+            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة/يوم)</span></label></div>
+            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة/يوم)</span></label></div>
+            <div class="task-row"><label class="checkbox-container"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
+            <div class="task-row" style="margin-top: 10px;">
+                <span style="font-size: 14px; color: #c9c4e6;">حضور القداسات الإلهية:</span>
+                <select id="massCount" style="width: auto; padding: 8px 12px;">
+                    <option value="0">لم أحضر</option>
+                    <option value="1">حضور قداس واحد (2 نقطة)</option>
+                    <option value="2">حضور قداسين (5 نقط)</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الأسبوعية</button>
+        <hr style="margin: 25px 0;">
+        <h3 style="font-size: 20px;">لوحة الصدارة والترتيب 🏆</h3>
+        <table>
+            <thead><tr><th>الترتيب</th><th>الكود المخصوص</th><th>إجمالي النقاط</th></tr></thead>
+            <tbody id="leaderboardBody"></tbody>
+        </table>
+        <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
+    </div>
+
+    <!-- صفحة الأدمن السري بالعربي -->
+    <div id="adminPage" class="page">
+        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم الخادم 👑</h2>
+        <table>
+            <thead><tr><th>الاسم الحقيقي</th><th>الكود</th><th>إجمالي النقاط</th></tr></thead>
+            <tbody id="adminTableBody"></tbody>
+        </table>
+        <button class="btn-secondary" style="margin-top: 25px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
+    </div>
+</div>
+
+<script>
+    // تم ربط بيانات Firebase الخاصة بمشروعك بنجاح
+    const firebaseConfig = {
+        apiKey: "AIzaSyAUWMRRga0dBeQhdi9jtHBC5vbbxZFWKko",
+        authDomain: "khelwaty-6160d.firebaseapp.com",
+        databaseURL: "https://khelwaty-6160d-default-rtdb.firebaseio.com",
+        projectId: "khelwaty-6160d",
+        storageBucket: "khelwaty-6160d.firebasestorage.app",
+        messagingSenderId: "222441453948",
+        appId: "1:222441453948:web:614ad674a3f9dce8e24cf9"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let globalUsers = {};
+    let currentUserCode = null;
+    
+    // 🔐 ده باسورد الأدمن، غيره براحتك من هنا في أي وقت
+    const ADMIN_PASSWORD = "Youssef2026"; 
+
+    db.ref('users').on('value', (snapshot) => {
+        globalUsers = snapshot.val() || {};
+        if(currentUserCode && globalUsers[currentUserCode]) {
+            document.getElementById('userPoints').innerText = globalUsers[currentUserCode].points;
+        }
+        renderLeaderboard();
+    });
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.getElementById('adminTopBtn').style.display = (pageId === 'welcomePage') ? 'block' : 'none';
+    }
+
+    function accessAdmin() {
+        const password = prompt("Enter Admin Password:");
+        if(password === ADMIN_PASSWORD) {
+            showPage('adminPage');
+            renderAdminTable();
+        } else if(password !== null) {
+            alert("Wrong Password!");
+        }
+    }
+
+    function handleRegister() {
+        const name = document.getElementById('regName').value.trim();
+        const password = document.getElementById('regPassword').value.trim();
+
+        if(!name || password.length < 4) {
+            alert('Please fill all fields correctly.');
+            return;
+        }
+
+        let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
+        
+        db.ref('users/' + uniqueCode).set({
+            name: name,
+            password: password,
+            code: uniqueCode,
+            points: 0,
+            danFinished: false
+        }, (error) => {
+            if(!error) {
+                document.getElementById('generatedCode').innerText = uniqueCode;
+                showPage('codePage');
+                document.getElementById('regName').value = '';
+                document.getElementById('regPassword').value = '';
+            }
+        });
+    }
+
+    function handleLogin() {
+        const code = document.getElementById('loginCode').value.trim().toUpperCase();
+        const pass = document.getElementById('loginPassword').value.trim();
+        
+        const user = globalUsers[code];
+
+        if(user && user.password === pass) {
+            currentUserCode = code;
+            showPage('dashboardPage');
+            document.getElementById('userPoints').innerText = user.points;
+            renderLeaderboard();
+        } else {
+            alert('Invalid Code or Password!');
+        }
+    }
+
+    function submitProgress() {
+        if(!currentUserCode) return;
+        const user = globalUsers[currentUserCode];
+        let addedPoints = 0;
+
+        const danCh = parseInt(document.getElementById('danChapters').value);
+        addedPoints += danCh * 1;
+        
+        let danFinishedStatus = user.danFinished || false;
+        if (danCh === 14 && !danFinishedStatus) {
+            addedPoints += 10;
+            danFinishedStatus = true;
+            alert("مبروك! أخذت 10 نقاط إضافية لإتمام سفر دانيال كاملاً 📖");
+        } else if (danCh < 14) {
+            danFinishedStatus = false;
+        }
+
+        if(document.getElementById('chkPray').checked) addedPoints += 2;
+        if(document.getElementById('chkBooks').checked) addedPoints += 2;
+        if(document.getElementById('chkConfess').checked) addedPoints += 10;
+
+        const massValue = parseInt(document.getElementById('massCount').value);
+        if(massValue === 1) addedPoints += 2;
+        else if(massValue === 2) addedPoints += 5;
+
+        if(addedPoints === 0) {
+            alert("قم بتحديد الأنشطة أولاً.");
+            return;
+        }
+
+        db.ref('users/' + currentUserCode).update({
+            points: user.points + addedPoints,
+            danFinished: danFinishedStatus
+        });
+
+        alert(`تم إضافة ${addedPoints} نقطة بنجاح والتسجيل على السيرفر ☁️`);
+        
+        document.getElementById('danChapters').value = "0";
+        document.getElementById('chkPray').checked = false;
+        document.getElementById('chkBooks').checked = false;
+        document.getElementById('chkConfess').checked = false;
+        document.getElementById('massCount').value = "0";
+    }
+
+    function renderLeaderboard() {
+        const userList = Object.values(globalUsers).sort((a,b) => b.points - a.points);
+        const tbody = document.getElementById('leaderboardBody');
+        tbody.innerHTML = '';
+        userList.forEach((user, index) => {
+            const row = `<tr>
+                <td style="font-weight: bold; color: ${index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'inherit'}">${index + 1}</td>
+                <td>${user.code} ${user.code === currentUserCode ? '<span style="color:var(--secondary-glow); font-weight:bold;">(أنت)</span>' : ''}</td>
+                <td style="color: var(--success-color); font-weight: bold;">${user.points}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function renderAdminTable() {
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = '';
+        const userList = Object.values(globalUsers);
+        if(userList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3">No users registered yet.</td></tr>`;
+            return;
+        }
+        userList.forEach((user) => {
+            const row = `<tr>
+                <td><strong style="color: #fff;">${user.name}</strong></td>
+                <td><span style="color: var(--text-muted);">${user.code}</span></td>
+                <td style="color: var(--admin-color); font-weight: bold;">${user.points} نقطة</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function logout() {
+        currentUserCode = null;
+        document.getElementById('loginCode').value = '';
+        document.getElementById('loginPassword').value = '';
+        showPage('welcomePage');
+    }
+</script>
+</body>
+</html>
