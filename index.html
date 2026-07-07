@@ -18,7 +18,6 @@
             --text-muted: #a49fc6;
             --success-color: #00e676;
             --admin-color: #ff9100;
-            --danger-color: #ff3333;
         }
         
         * { box-sizing: border-box; transition: all 0.3s ease; }
@@ -34,7 +33,6 @@
         button:hover { transform: translateY(-2px); opacity: 0.95; }
         .btn-secondary { background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%); }
         .btn-success { background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%); margin: 20px auto 10px auto; display: block; }
-        .btn-danger { background: linear-gradient(90deg, #ff416c 0%, #ff4b2b 100%); }
         .btn-admin-top { position: absolute; top: 20px; left: 20px; width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 20px; }
         .page { display: none; }
         .active { display: block; animation: fadeIn 0.4s ease-out; }
@@ -63,11 +61,6 @@
         .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
         hr { border: 0; border-top: 1px solid var(--card-border); margin: 15px 0; }
-        
-        .admin-tools { background: rgba(255, 145, 0, 0.05); border: 1px solid rgba(255, 145, 0, 0.2); padding: 15px; border-radius: 14px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .admin-tools button { width: auto; font-size: 13px; padding: 8px 16px; margin: 0; }
-        .btn-delete-log { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 16px; padding: 2px 6px; margin: 0; width: auto; display: inline-block; }
-        .btn-delete-log:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -75,7 +68,6 @@
 <div class="container">
     <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
 
-    <!-- صفحة الترحيب -->
     <div id="welcomePage" class="page active">
         <h2 style="margin-top: 40px; margin-bottom: 5px;">Khelwaty</h2>
         <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
@@ -83,7 +75,6 @@
         <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
     </div>
 
-    <!-- صفحة إنشاء حساب -->
     <div id="registerPage" class="page">
         <h2>Create Account</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -98,14 +89,12 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- صفحة ظهور الكود -->
     <div id="codePage" class="page">
         <h2>Account Created! 🎉</h2>
         <div class="code-display" id="generatedCode"></div>
         <button onclick="showPage('loginPage')">Go to Login</button>
     </div>
 
-    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="page">
         <h2>Login</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -120,7 +109,6 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- لوحة التحكم من الداخل (بالعربي) -->
     <div id="dashboardPage" class="page">
         <h3>خلوتك الروحية اليومية 🌟</h3>
         <div class="points-badge">مجموع نقاطك: <span id="userPoints">0</span> نقطة</div>
@@ -147,13 +135,12 @@
 
         <div class="task-card">
             <label>⚙️ الأنشطة والوسائط الروحية الأخرى:</label>
-            <span class="hint" style="color: #ff9100; margin-bottom: 8px;">الأنشطة التي تقوم بحفظها اليوم سيتم قفلها حتى الغد لمنع تكرار تجميع النقاط.</span>
             <hr>
             <div class="task-row"><label class="checkbox-container" id="lblPray"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة)</span></label></div>
             <div class="task-row"><label class="checkbox-container" id="lblBooks"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة)</span></label></div>
             <div class="task-row"><label class="checkbox-container" id="lblConfess"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
             <div class="task-row" style="margin-top: 10px;">
-                <span style="font-size: 14px; color: #c9c4e6;" id="lblMass">حضور القداسات الإلهية:</span>
+                <span style="font-size: 14px; color: #c9c4e6;">حضور القداسات الإلهية:</span>
                 <select id="massCount" style="width: auto; padding: 8px 12px;">
                     <option value="0">لم أحضر</option>
                     <option value="1">حضور قداس واحد (2 نقطة)</option>
@@ -172,17 +159,10 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- صفحة الأدمن المحدثة بسجل تاريخي كامل يوم بيوم وساعة بساعة -->
     <div id="adminPage" class="page">
-        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">سجل متابعة المخدومين اليومي 👑</h2>
+        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم خلوتي الكلية 👑</h2>
         
-        <!-- أدوات التحكم الخاصة بالأدمن لمسح الهيستوري والتست -->
-        <div class="admin-tools">
-            <button class="btn-secondary" onclick="clearAllHistoryLogs()">🗑️ مسح سجل الأنشطة بالكامل</button>
-            <button style="background: #ff9100;" onclick="resetAllUsersPoints()">🔄 تصفير نقاط كل المستخدمين</button>
-            <button class="btn-danger" onclick="fullSystemReset()">⚠️ حذف جميع الحسابات والداتا نهائياً</button>
-        </div>
-
+        <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📝 سجل متابعة الأنشطة اليومي (بالوقت والدقيقة):</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
                 <thead>
@@ -194,14 +174,31 @@
                         <th>كتب روحية</th>
                         <th>اعتراف</th>
                         <th>القداس</th>
-                        <th>إجمالي النقاط الحالي</th>
-                        <th>إجراء</th>
+                        <th>إجمالي النقاط</th>
                     </tr>
                 </thead>
                 <tbody id="adminTableBody"></tbody>
             </table>
         </div>
-        <button class="btn-secondary" style="margin-top: 25px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
+
+        <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1);">
+
+        <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل (قديم وجديد):</h3>
+        <div style="overflow-x: auto; width: 100%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>اسم المخدوم</th>
+                        <th>الكود المخصوص</th>
+                        <th>كلمة المرور (الباسورد)</th>
+                        <th>مجموع النقط الحالي</th>
+                    </tr>
+                </thead>
+                <tbody id="allAccountsTableBody"></tbody>
+            </table>
+        </div>
+
+        <button class="btn-secondary" style="margin-top: 35px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
     </div>
 </div>
 
@@ -223,12 +220,6 @@
     let currentUserCode = null;
     const ADMIN_PASSWORD = "Foshy2026#"; // باسورد الأدمن في السطر 200 بالظبط!
 
-    // دالة للحصول على تاريخ اليوم بصيغة ثابتة (مثال: "2026-07-06") لمنع تكرار نقاط نفس اليوم
-    function getTodayKey() {
-        const d = new Date();
-        return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-    }
-
     db.ref('users').on('value', (snapshot) => {
         globalUsers = snapshot.val() || {};
         if(currentUserCode && globalUsers[currentUserCode]) {
@@ -236,6 +227,10 @@
             applyLocks(globalUsers[currentUserCode]);
         }
         renderLeaderboard();
+        // تحديث جدول الحسابات أوتوماتيكياً لو الأدمن فاتح الصفحة
+        if(document.getElementById('adminPage').classList.contains('active')) {
+            renderAllAccountsTable();
+        }
     });
 
     function showPage(pageId) {
@@ -249,6 +244,7 @@
         if(password === ADMIN_PASSWORD) {
             showPage('adminPage');
             renderAdminTable();
+            renderAllAccountsTable(); // تشغيل جدول دليل الحسابات عند الدخول
         } else if(password !== null) {
             alert("Wrong Password!");
         }
@@ -262,7 +258,7 @@
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
         db.ref('users/' + uniqueCode).set({
             name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
-            readDanChapters: "", dailyTasksDone: ""
+            readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false
         }, (error) => {
             if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
@@ -281,7 +277,6 @@
     }
 
     function applyLocks(user) {
-        // 1. قفل إصحاحات دانيال المحفوظة مسبقاً رمادياً
         let savedChs = user.readDanChapters ? user.readDanChapters.split(',') : [];
         document.querySelectorAll('.dan-ch').forEach(cb => {
             if(savedChs.includes(cb.value)) {
@@ -289,71 +284,22 @@
                 cb.disabled = true;
                 document.getElementById('lbl-dan-' + cb.value).classList.add('disabled-label');
             } else {
-                cb.checked = false;
                 cb.disabled = false;
                 document.getElementById('lbl-dan-' + cb.value).classList.remove('disabled-label');
             }
         });
 
-        // 2. قفل الأنشطة الروحية اليومية لو كانت اتعملت النهاردة
-        const todayKey = getTodayKey();
-        let dailyDone = user.dailyTasksDone ? user.dailyTasksDone.split(',') : [];
-        
-        // الأجبية
-        if(dailyDone.includes(`pray_${todayKey}`)) {
-            document.getElementById('chkPray').checked = true;
-            document.getElementById('chkPray').disabled = true;
-            document.getElementById('lblPray').classList.add('disabled-label');
-        } else {
-            document.getElementById('chkPray').checked = false;
-            document.getElementById('chkPray').disabled = false;
-            document.getElementById('lblPray').classList.remove('disabled-label');
-        }
-
-        // الكتب الروحية
-        if(dailyDone.includes(`books_${todayKey}`)) {
-            document.getElementById('chkBooks').checked = true;
-            document.getElementById('chkBooks').disabled = true;
-            document.getElementById('lblBooks').classList.add('disabled-label');
-        } else {
-            document.getElementById('chkBooks').checked = false;
-            document.getElementById('chkBooks').disabled = false;
-            document.getElementById('lblBooks').classList.remove('disabled-label');
-        }
-
-        // الاعتراف
-        if(dailyDone.includes(`confess_${todayKey}`)) {
-            document.getElementById('chkConfess').checked = true;
-            document.getElementById('chkConfess').disabled = true;
-            document.getElementById('lblConfess').classList.add('disabled-label');
-        } else {
-            document.getElementById('chkConfess').checked = false;
-            document.getElementById('chkConfess').disabled = false;
-            document.getElementById('lblConfess').classList.remove('disabled-label');
-        }
-
-        // القداسات
-        if(dailyDone.some(item => item.startsWith(`mass_${todayKey}_`))) {
-            document.getElementById('massCount').disabled = true;
-            document.getElementById('lblMass').classList.add('disabled-label');
-            // استرجاع القيمة المسجلة للعرض فقط
-            let savedMassItem = dailyDone.find(item => item.startsWith(`mass_${todayKey}_`));
-            let savedVal = savedMassItem.split('_')[2];
-            document.getElementById('massCount').value = savedVal;
-        } else {
-            document.getElementById('massCount').disabled = false;
-            document.getElementById('lblMass').classList.remove('disabled-label');
-            document.getElementById('massCount').value = "0";
-        }
+        document.getElementById('chkPray').checked = false;
+        document.getElementById('chkBooks').checked = false;
+        document.getElementById('chkConfess').checked = false;
+        document.getElementById('massCount').value = "0";
     }
 
     function submitProgress() {
         if(!currentUserCode) return;
         const user = globalUsers[currentUserCode];
         let addedPoints = 0;
-        const todayKey = getTodayKey();
 
-        // معالجة إصحاحات دانيال
         let oldChapters = user.readDanChapters ? user.readDanChapters.split(',') : [];
         let newlySelectedChapters = [];
         let allChapters = [...oldChapters];
@@ -373,49 +319,20 @@
             alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط بونص 📖🎉");
         }
 
-        // معالجة الأنشطة الروحية مع الحماية من التكرار اليومي
-        let dailyDone = user.dailyTasksDone ? user.dailyTasksDone.split(',') : [];
-        
         let prayStatus = document.getElementById('chkPray').checked;
-        let prayEnabled = !document.getElementById('chkPray').disabled;
-        let newlyPrayed = false;
-        if(prayStatus && prayEnabled) {
-            addedPoints += 2;
-            dailyDone.push(`pray_${todayKey}`);
-            newlyPrayed = true;
-        }
-
         let booksStatus = document.getElementById('chkBooks').checked;
-        let booksEnabled = !document.getElementById('chkBooks').disabled;
-        let newlyReadBooks = false;
-        if(booksStatus && booksEnabled) {
-            addedPoints += 2;
-            dailyDone.push(`books_${todayKey}`);
-            newlyReadBooks = true;
-        }
-
         let confessStatus = document.getElementById('chkConfess').checked;
-        let confessEnabled = !document.getElementById('chkConfess').disabled;
-        let newlyConfessed = false;
-        if(confessStatus && confessEnabled) {
-            addedPoints += 10;
-            dailyDone.push(`confess_${todayKey}`);
-            newlyConfessed = true;
-        }
+
+        if(prayStatus) addedPoints += 2;
+        if(booksStatus) addedPoints += 2;
+        if(confessStatus) addedPoints += 10;
 
         const massValue = parseInt(document.getElementById('massCount').value);
-        const massEnabled = !document.getElementById('massCount').disabled;
-        let newlyMass = false;
-        if(massValue > 0 && massEnabled) {
-            if(massValue === 1) addedPoints += 2;
-            else if(massValue === 2) addedPoints += 5;
-            dailyDone.push(`mass_${todayKey}_${massValue}`);
-            newlyMass = true;
-        }
+        if(massValue === 1) addedPoints += 2;
+        else if(massValue === 2) addedPoints += 5;
 
-        // التحقق من وجود أي جديد لحفظه
-        if(newlySelectedChapters.length === 0 && !newlyPrayed && !newlyReadBooks && !newlyConfessed && !newlyMass) {
-            alert("لا توجد أنشطة جديدة لحفظها اليوم أو تم قفل أنشطتك مسبقاً.");
+        if(addedPoints === 0 && massValue === 0) {
+            alert("لا توجد أنشطة جديدة لحفظها.");
             return;
         }
 
@@ -426,24 +343,21 @@
 
         let newPoints = user.points + addedPoints;
 
-        // تحديث بيانات المستخدم في فايربيس
         db.ref('users/' + currentUserCode).update({
             points: newPoints,
             danFinished: danFinishedStatus,
-            readDanChapters: allChapters.join(','),
-            dailyTasksDone: dailyDone.join(',')
+            readDanChapters: allChapters.join(',')
         });
 
-        // إضافة اللوج إلى الهيستوري
         db.ref('history_logs').push({
             name: user.name,
             code: user.code,
             timestamp: fullStamp,
             danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
-            prayed: newlyPrayed ? "✅" : (document.getElementById('chkPray').disabled ? "تم سابقاً" : "❌"),
-            readBooks: newlyReadBooks ? "✅" : (document.getElementById('chkBooks').disabled ? "تم سابقاً" : "❌"),
-            confessed: newlyConfessed ? "✅" : (document.getElementById('chkConfess').disabled ? "تم سابقاً" : "❌"),
-            mass: newlyMass ? (massValue === 1 ? "قداس" : "قداسين+") : (document.getElementById('massCount').disabled ? "تم سابقاً" : "❌"),
+            prayed: prayStatus ? "✅" : "❌",
+            readBooks: booksStatus ? "✅" : "❌",
+            confessed: confessStatus ? "✅" : "❌",
+            mass: massValue === 1 ? "قداس" : massValue === 2 ? "قداسين+" : "❌",
             currentTotalPoints: newPoints
         });
 
@@ -467,19 +381,16 @@
         const tbody = document.getElementById('adminTableBody');
         tbody.innerHTML = '';
         
-        db.ref('history_logs').on('value', (snapshot) => {
+        db.ref('history_logs').once('value', (snapshot) => {
             const logs = snapshot.val() || {};
-            tbody.innerHTML = '';
+            const logList = Object.values(logs).reverse();
             
-            const logKeys = Object.keys(logs).reverse();
-            
-            if(logKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9">لم يقم أي مخدوم بتسجيل أنشطة بعد.</td></tr>`;
+            if(logList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8">لم يقم أي مخدوم بتسجيل أنشطة بعد.</td></tr>`;
                 return;
             }
             
-            logKeys.forEach((key) => {
-                const log = logs[key];
+            logList.forEach((log) => {
                 tbody.innerHTML += `<tr>
                     <td><strong style="color:#fff;">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
                     <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timestamp}</td>
@@ -489,64 +400,35 @@
                     <td>${log.confessed}</td>
                     <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
                     <td style="color:var(--success-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
-                    <td><button class="btn-delete-log" onclick="deleteSingleLog('${key}')" title="حذف هذا السجل">❌</button></td>
                 </tr>`;
             });
         });
     }
 
-    // ================= أدوات تحكم الأدمن الجديدة لمسح الهيستوري والتست =================
-    
-    // 1. حذف سجل مفرد (لوج محدد من الجدول)
-    function deleteSingleLog(logId) {
-        if(confirm("هل أنت متأكد من حذف هذا السجل المحدد؟")) {
-            db.ref('history_logs/' + logId).remove()
-            .then(() => alert("تم حذف السجل بنجاح!"))
-            .catch(err => alert("حدث خطأ: " + err));
+    // [الدالة السحرية الجديدة] لعرض جميع الحسابات المسجلة بلا استثناء
+    function renderAllAccountsTable() {
+        const tbody = document.getElementById('allAccountsTableBody');
+        tbody.innerHTML = '';
+        
+        const userList = Object.values(globalUsers).sort((a, b) => b.points - a.points); // ترتيب تنازلي حسب النقط الأعلى
+        
+        if(userList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4">لا توجد حسابات مسجلة في المنظومة حتى الآن.</td></tr>`;
+            return;
         }
-    }
-
-    // 2. مسح كل سجلات الأنشطة (الهيستوري بالكامل)
-    function clearAllHistoryLogs() {
-        if(confirm("هل أنت متأكد من حذف سجل الأنشطة بالكامل؟ هذا سيمسح جدول الأدمن بالكامل ولكنه سيحتفظ بالنقاط الحالية لليوزرز.")) {
-            db.ref('history_logs').remove()
-            .then(() => alert("تم مسح سجل الأنشطة التاريخي بالكامل!"))
-            .catch(err => alert("حدث خطأ: " + err));
-        }
-    }
-
-    // 3. تصفير نقاط كل اليوزرز وإعادة فتح الأنشطة (لتنظيف حسابات التست)
-    function resetAllUsersPoints() {
-        if(confirm("هل تريد تصفير نقاط جميع المستخدمين وإعادة تصفير إصحاحاتهم وأنشطتهم اليومية للبدء من جديد؟")) {
-            db.ref('users').once('value', (snapshot) => {
-                const users = snapshot.val() || {};
-                const updates = {};
-                Object.keys(users).forEach(code => {
-                    updates[code + '/points'] = 0;
-                    updates[code + '/danFinished'] = false;
-                    updates[code + '/readDanChapters'] = "";
-                    updates[code + '/dailyTasksDone'] = "";
-                });
-                db.ref('users').update(updates)
-                .then(() => alert("تم تصفير نقاط وجداول جميع المستخدمين بنجاح!"))
-                .catch(err => alert("حدث خطأ: " + err));
-            });
-        }
-    }
-
-    // 4. حذف كل شيء تماماً من الداتا بيز (النظام بالكامل كأنه جديد)
-    function fullSystemReset() {
-        if(confirm("🚨 تحذير نهائي: هذا الإجراء سيقوم بحذف جميع حسابات المستخدمين وسجل الأنشطة بالكامل نهائياً! هل أنت متأكد؟")) {
-            db.ref('/').remove()
-            .then(() => {
-                alert("تم تصفير وتنظيف قاعدة البيانات بالكامل بنجاح! يرجى إعادة إنعاش الصفحة.");
-                location.reload();
-            })
-            .catch(err => alert("حدث خطأ: " + err));
-        }
+        
+        userList.forEach((user) => {
+            tbody.innerHTML += `<tr>
+                <td><strong style="color:#fff;">${user.name}</strong></td>
+                <td style="color:var(--secondary-glow); font-weight:600;">${user.code}</td>
+                <td style="color:var(--text-muted); font-family:monospace;">${user.password}</td>
+                <td style="color:var(--success-color); font-weight:bold;">${user.points} نقطة</td>
+            </tr>`;
+        });
     }
 
     function logout() { currentUserCode = null; showPage('welcomePage'); }
 </script>
 </body>
 </html>
+
