@@ -100,6 +100,10 @@
         th, td { padding: 10px; text-align: center; font-size: 13px; }
         th { background: var(--table-th-bg); color: var(--title-color); }
         td { background: var(--table-td-bg); border-top: 1px solid var(--card-border); color: var(--text-main); }
+        
+        /* ستايل مميز للسطر الخاص باليوزر الحالي في لوحة الصدارة */
+        .my-ranking-row { background: rgba(138, 43, 226, 0.15) !important; border: 1px solid var(--primary-glow); }
+        
         .nav-links { text-align: center; margin-top: 20px; }
         .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
@@ -164,7 +168,6 @@
     <div id="dashboardPage" class="page">
         <!-- منطقة اللوجو والاسم المحدثة -->
         <div class="team-title-container">
-            <!-- أيقونة النسر الجاهزة، لو عايز تغيرها بصورة حط مكان سطر الـ <i> الكود ده: <img src="رابط_الصورة" class="custom-logo-img"> -->
             <i class="fa-solid fa-eagle team-logo"></i>
             <h3 style="margin: 0;">Eagles Team 🌟</h3>
         </div>
@@ -338,10 +341,11 @@
         const pass = document.getElementById('loginPassword').value.trim();
         const user = globalUsers[code];
         if(user && user.password === pass) {
-            currentUserCode = code;
+            currentUserCode = code; // كود المستخدم بيتحفظ هنا أول ما يسجل
             showPage('dashboardPage');
             document.getElementById('userPoints').innerText = user.points;
             applyLocks(user);
+            renderLeaderboard(); // تشغيل تحديث اللوحة فوراً عشان الكلمة تظهر
         } else { alert('Invalid Code or Password!'); }
     }
 
@@ -493,13 +497,18 @@
         }
     }
 
+    // تعديل دالة لوحة الصدارة لربط كود اليوزر الحالي بكلمة (You) وتلوين الصف
     function renderLeaderboard() {
         const userList = Object.values(globalUsers).sort((a,b) => b.points - a.points);
         const tbody = document.getElementById('leaderboardBody');
         tbody.innerHTML = '';
+        
         userList.forEach((user, index) => {
-            const isMe = (user.code === currentUserCode) ? ' <span style="color:var(--secondary-glow); font-weight:bold;">(You)</span>' : '';
-            tbody.innerHTML += `<tr>
+            // فحص دقيق: لو الكود الحالي بيساوي كود اليوزر المسجل، يكتب جنب الكود (You) بوضوح
+            const isMe = (currentUserCode && user.code === currentUserCode) ? ' <span style="color:#00bfff; font-weight:bold;">(You)</span>' : '';
+            const rowClass = (currentUserCode && user.code === currentUserCode) ? 'class="my-ranking-row"' : '';
+
+            tbody.innerHTML += `<tr ${rowClass}>
                 <td style="font-weight:bold; color:${index===0?'#ffd700':index===1?'#c0c0c0':'#cd7f32'}">${index + 1}</td>
                 <td>${user.code}${isMe}</td>
                 <td style="color:var(--success-color); font-weight:bold;">${user.points}</td>
