@@ -8,8 +8,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
+        /* الألوان الافتراضية (الوضع المظلم الداكن) */
         :root {
             --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #15102a 100%);
+            --container-bg: rgba(21, 16, 42, 0.75);
             --card-bg: rgba(255, 255, 255, 0.06);
             --card-border: rgba(255, 255, 255, 0.1);
             --primary-glow: #8a2be2;
@@ -19,47 +21,76 @@
             --success-color: #00e676;
             --admin-color: #ff9100;
             --danger-color: #ff3333;
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --table-th-bg: rgba(255, 255, 255, 0.08);
+            --table-td-bg: rgba(255, 255, 255, 0.02);
+            --shadow: rgba(0, 0, 0, 0.4);
+            --title-color: #fff;
+            --label-color: #c9c4e6;
+        }
+
+        /* ألوان الوضع المضيء (Light Mode) */
+        [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #f0f2f5 0%, #e4e7eb 100%);
+            --container-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: rgba(0, 0, 0, 0.03);
+            --card-border: rgba(0, 0, 0, 0.1);
+            --text-main: #2d2d2d;
+            --text-muted: #65676b;
+            --input-bg: rgba(0, 0, 0, 0.04);
+            --table-th-bg: rgba(0, 0, 0, 0.06);
+            --table-td-bg: rgba(0, 0, 0, 0.01);
+            --shadow: rgba(0, 0, 0, 0.1);
+            --title-color: #1a1a1a;
+            --label-color: #4b4b4b;
         }
         
-        * { box-sizing: border-box; transition: all 0.3s ease; }
+        * { box-sizing: border-box; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s; }
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg-gradient); min-height: 100vh; margin: 0; padding: 20px 15px; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
-        .container { width: 100%; max-width: 850px; background: rgba(21, 16, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid var(--card-border); padding: 30px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); position: relative; overflow: hidden; }
-        h2, h3 { text-align: center; color: #fff; font-weight: 800; margin-top: 10px; }
-        h2 { font-size: 28px; background: linear-gradient(to left, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .container { width: 100%; max-width: 850px; background: var(--container-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); padding: 30px 24px; border-radius: 24px; box-shadow: 0 20px 50px var(--shadow); position: relative; overflow: hidden; }
+        
+        /* زرار التبديل العلوي */
+        .top-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; align-items: center; z-index: 10; }
+        .btn-theme-toggle { width: auto; padding: 6px 12px; font-size: 14px; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 20px; cursor: pointer; margin: 0; font-weight: 600; }
+        .btn-theme-toggle:hover { background: var(--card-border); }
+        .btn-admin-top { width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: #a49fc6; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; margin: 0; }
+        
+        h2, h3 { text-align: center; color: var(--title-color); font-weight: 800; margin-top: 10px; }
+        h2 { font-size: 28px; }
+        .welcome-title { background: linear-gradient(to left, var(--title-color), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         p { text-align: center; color: var(--text-muted); font-size: 14px; }
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #c9c4e6; }
-        input[type="text"], input[type="password"], select { width: 100%; padding: 14px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 12px; color: #fff; font-size: 15px; outline: none; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: var(--label-color); }
+        input[type="text"], input[type="password"], select { width: 100%; padding: 14px 16px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-main); font-size: 15px; outline: none; }
         button { width: 100%; padding: 14px; background: linear-gradient(90deg, #7928ca 0%, #ff0080 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; }
         button:hover { transform: translateY(-2px); opacity: 0.95; }
         .btn-secondary { background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%); }
         .btn-success { background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%); margin: 20px auto 10px auto; display: block; }
-        .btn-admin-top { position: absolute; top: 20px; left: 20px; width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 20px; }
         .btn-danger-sm { width: auto; padding: 4px 10px; font-size: 11px; background: rgba(255, 51, 51, 0.15); border: 1px solid rgba(255, 51, 51, 0.3); color: var(--danger-color); border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-danger-sm:hover { background: var(--danger-color); color: #fff; }
         .page { display: none; }
         .active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .code-display { background: rgba(255, 255, 255, 0.05); border: 2px dashed rgba(255, 0, 128, 0.4); padding: 18px; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 800; color: #ff0080; }
+        .code-display { background: var(--card-bg); border: 2px dashed rgba(255, 0, 128, 0.4); padding: 18px; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 800; color: #ff0080; }
         .points-badge { text-align: center; font-size: 18px; font-weight: 700; margin: 20px 0; padding: 14px; background: rgba(0, 230, 118, 0.1); border: 1px solid rgba(0, 230, 118, 0.2); color: var(--success-color); border-radius: 14px; }
         .points-badge span { font-size: 24px; font-weight: 800; }
         .task-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: 16px; margin-bottom: 16px; }
         .task-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .chapters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
         .checkbox-container { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-        .checkbox-container input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--card-border); border-radius: 5px; background: rgba(255,255,255,0.02); display: grid; place-content: center; cursor: pointer; }
+        .checkbox-container input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--card-border); border-radius: 5px; background: var(--input-bg); display: grid; place-content: center; cursor: pointer; }
         .checkbox-container input::before { content: "✓"; font-size: 12px; font-weight: bold; color: #fff; transform: scale(0); }
         .checkbox-container input:checked { background: var(--primary-glow); border-color: var(--primary-glow); }
         .checkbox-container input:checked::before { transform: scale(1); }
         
-        .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; cursor: not-allowed; }
-        .checkbox-container input:disabled::before { color: #888 !important; }
-        .disabled-label { color: #666 !important; cursor: not-allowed; }
+        .checkbox-container input:disabled { background: #ccc !important; border-color: #aaa !important; cursor: not-allowed; }
+        [data-theme="dark"] .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; }
+        .disabled-label { color: #888 !important; cursor: not-allowed; text-decoration: line-through; }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); }
         th, td { padding: 10px; text-align: center; font-size: 13px; }
-        th { background: rgba(255, 255, 255, 0.08); color: #fff; }
-        td { background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--card-border); color: #e1def2; }
+        th { background: var(--table-th-bg); color: var(--title-color); }
+        td { background: var(--table-td-bg); border-top: 1px solid var(--card-border); color: var(--text-main); }
         .nav-links { text-align: center; margin-top: 20px; }
         .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
@@ -69,17 +100,23 @@
 <body>
 
 <div class="container">
-    <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
+    <!-- أدوات التحكم العلوية (موجودة دائماً وفي كل الصفحات) -->
+    <div class="top-controls">
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">☀️ الوضع المضيء</button>
+        <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
+    </div>
 
+    <!-- صفحة الترحيب -->
     <div id="welcomePage" class="page active">
-        <h2 style="margin-top: 40px; margin-bottom: 5px;">Khelwaty</h2>
+        <h2 class="welcome-title" style="margin-top: 50px; margin-bottom: 5px;">Khelwaty</h2>
         <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
         <button onclick="showPage('loginPage')">Login</button>
         <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
     </div>
 
+    <!-- صفحة إنشاء حساب -->
     <div id="registerPage" class="page">
-        <h2>Create Account</h2>
+        <h2 style="margin-top: 30px;">Create Account</h2>
         <div class="form-group" style="margin-top: 20px;">
             <label>Full Name:</label>
             <input type="text" id="regName" placeholder="Enter your name">
@@ -92,14 +129,16 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
+    <!-- صفحة ظهور الكود -->
     <div id="codePage" class="page">
         <h2>Account Created! 🎉</h2>
         <div class="code-display" id="generatedCode"></div>
         <button onclick="showPage('loginPage')">Go to Login</button>
     </div>
 
+    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="page">
-        <h2>Login</h2>
+        <h2 style="margin-top: 30px;">Login</h2>
         <div class="form-group" style="margin-top: 20px;">
             <label>Your Unique Code:</label>
             <input type="text" id="loginCode" placeholder="e.g., M-1234">
@@ -112,8 +151,9 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
+    <!-- لوحة التحكم من الداخل (بالعربي) -->
     <div id="dashboardPage" class="page">
-        <h3>خلوتك الروحية اليومية 🌟</h3>
+        <h3 style="margin-top: 30px;">خلوتك الروحية اليومية 🌟</h3>
         <div class="points-badge">مجموع نقاطك: <span id="userPoints">0</span> نقطة</div>
 
         <div class="task-card">
@@ -138,18 +178,12 @@
 
         <div class="task-card">
             <label>⚙️ الأنشطة والوسائط الروحية الأخرى:</label>
+            <span class="hint" style="color: var(--secondary-glow);">* صلاة الأجبية والكتب الروحية تُقفل بعد الحفظ وتفتح تلقائياً كل 12 ساعة فقط!</span>
             <hr>
             <div class="task-row"><label class="checkbox-container" id="lblPray"><input type="checkbox" id="chkPray"><span>الصلاة بالأجبية (2 نقطة)</span></label></div>
             <div class="task-row"><label class="checkbox-container" id="lblBooks"><input type="checkbox" id="chkBooks"><span>قراءة كتب روحية (2 نقطة)</span></label></div>
             <div class="task-row"><label class="checkbox-container" id="lblConfess"><input type="checkbox" id="chkConfess"><span>سر الاعتراف (10 نقط)</span></label></div>
-            <div class="task-row" style="margin-top: 10px;">
-                <span style="font-size: 14px; color: #c9c4e6;">حضور القداسات الإلهية:</span>
-                <select id="massCount" style="width: auto; padding: 8px 12px;">
-                    <option value="0">لم أحضر</option>
-                    <option value="1">حضور قداس واحد (2 نقطة)</option>
-                    <option value="2">حضور قداسين أو أكثر (5 نقط)</option>
-                </select>
-            </div>
+            <div class="task-row"><label class="checkbox-container" id="lblMass"><input type="checkbox" id="chkMass"><span>حضور القداس الإلهي (2 نقطة / 5 نقاط للقداس الثاني في الأسبوع)</span></label></div>
         </div>
 
         <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الروحية</button>
@@ -162,9 +196,11 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
+    <!-- لوحة الأدمن الاحترافية -->
     <div id="adminPage" class="page">
-        <h2 style="background: linear-gradient(to left, #fff, var(--admin-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">لوحة تحكم خلوتي الكلية 👑</h2>
+        <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
         
+        <!-- الجدول الأول: السجل اليومي بالحركات -->
         <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📝 سجل متابعة الأنشطة اليومي (بالوقت والدقيقة):</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
@@ -184,8 +220,9 @@
             </table>
         </div>
 
-        <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1);">
+        <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1); border-color: var(--card-border);">
 
+        <!-- الجدول الثاني: دليل كل الحسابات مع إمكانية الحذف -->
         <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها:</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
@@ -222,7 +259,21 @@
 
     let globalUsers = {};
     let currentUserCode = null;
-    const ADMIN_PASSWORD = "Foshy2026#"; // باسورد الأدمن في السطر 200 بالظبط!
+    const ADMIN_PASSWORD = "Foshy2026#"; 
+
+    // دالة تبديل الثيم الـ Light / Dark
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const themeBtn = document.getElementById('themeToggleBtn');
+        
+        if (currentTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeBtn.innerText = "☀️ الوضع المضيء";
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeBtn.innerText = "🌙 الوضع المظلم";
+        }
+    }
 
     db.ref('users').on('value', (snapshot) => {
         globalUsers = snapshot.val() || {};
@@ -231,7 +282,6 @@
             applyLocks(globalUsers[currentUserCode]);
         }
         renderLeaderboard();
-        // تحديث جدول الحسابات أوتوماتيكياً لو الأدمن فاتح الصفحة
         if(document.getElementById('adminPage').classList.contains('active')) {
             renderAllAccountsTable();
         }
@@ -240,6 +290,7 @@
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
+        // إظهار زرار الأدمن فقط في الصفحة الرئيسية الترحيبية
         document.getElementById('adminTopBtn').style.display = (pageId === 'welcomePage') ? 'block' : 'none';
     }
 
@@ -262,7 +313,7 @@
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
         db.ref('users/' + uniqueCode).set({
             name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
-            readDanChapters: "", hasPrayed: false, hasReadBooks: false, hasConfessed: false
+            readDanChapters: "", lastPrayTime: 0, lastBooksTime: 0, hasConfessed: false
         }, (error) => {
             if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
@@ -293,16 +344,44 @@
             }
         });
 
-        document.getElementById('chkPray').checked = false;
-        document.getElementById('chkBooks').checked = false;
+        let nowMs = Date.now();
+        let twelveHoursMs = 12 * 60 * 60 * 1000;
+
+        // فحص الأجبية
+        let lastPray = user.lastPrayTime || 0;
+        let chkPray = document.getElementById('chkPray');
+        if (nowMs - lastPray < twelveHoursMs) {
+            chkPray.checked = true;
+            chkPray.disabled = true;
+            document.getElementById('lblPray').classList.add('disabled-label');
+        } else {
+            chkPray.checked = false;
+            chkPray.disabled = false;
+            document.getElementById('lblPray').classList.remove('disabled-label');
+        }
+
+        // فحص الكتب الروحية
+        let lastBooks = user.lastBooksTime || 0;
+        let chkBooks = document.getElementById('chkBooks');
+        if (nowMs - lastBooks < twelveHoursMs) {
+            chkBooks.checked = true;
+            chkBooks.disabled = true;
+            document.getElementById('lblBooks').classList.add('disabled-label');
+        } else {
+            chkBooks.checked = false;
+            chkBooks.disabled = false;
+            document.getElementById('lblBooks').classList.remove('disabled-label');
+        }
+
         document.getElementById('chkConfess').checked = false;
-        document.getElementById('massCount').value = "0";
+        document.getElementById('chkMass').checked = false;
     }
 
     function submitProgress() {
         if(!currentUserCode) return;
         const user = globalUsers[currentUserCode];
         let addedPoints = 0;
+        let nowMs = Date.now();
 
         let oldChapters = user.readDanChapters ? user.readDanChapters.split(',') : [];
         let newlySelectedChapters = [];
@@ -323,49 +402,83 @@
             alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط بونص 📖🎉");
         }
 
-        let prayStatus = document.getElementById('chkPray').checked;
-        let booksStatus = document.getElementById('chkBooks').checked;
+        let prayStatus = document.getElementById('chkPray').checked && !document.getElementById('chkPray').disabled;
+        let booksStatus = document.getElementById('chkBooks').checked && !document.getElementById('chkBooks').disabled;
         let confessStatus = document.getElementById('chkConfess').checked;
+        let massStatus = document.getElementById('chkMass').checked;
 
         if(prayStatus) addedPoints += 2;
         if(booksStatus) addedPoints += 2;
         if(confessStatus) addedPoints += 10;
-
-        const massValue = parseInt(document.getElementById('massCount').value);
-        if(massValue === 1) addedPoints += 2;
-        else if(massValue === 2) addedPoints += 5;
-
-        if(addedPoints === 0 && massValue === 0) {
-            alert("لا توجد أنشطة جديدة لحفظها.");
-            return;
-        }
 
         let now = new Date();
         let timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         let dateString = now.toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' });
         let fullStamp = `${dateString} - الساعة ${timeString}`;
 
-        let newPoints = user.points + addedPoints;
+        let massPointsEarned = 0;
+        let massTextForLog = "❌";
 
-        db.ref('users/' + currentUserCode).update({
-            points: newPoints,
-            danFinished: danFinishedStatus,
-            readDanChapters: allChapters.join(',')
-        });
+        if(massStatus) {
+            db.ref('history_logs').orderByChild('code').equalTo(currentUserCode).once('value', (snapshot) => {
+                const logs = snapshot.val() || {};
+                let hasMassInLast7Days = false;
 
-        db.ref('history_logs').push({
-            name: user.name,
-            code: user.code,
-            timestamp: fullStamp,
-            danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
-            prayed: prayStatus ? "✅" : "❌",
-            readBooks: booksStatus ? "✅" : "❌",
-            confessed: confessStatus ? "✅" : "❌",
-            mass: massValue === 1 ? "قداس" : massValue === 2 ? "قداسين+" : "❌",
-            currentTotalPoints: newPoints
-        });
+                for(let key in logs) {
+                    if(logs[key].mass && logs[key].mass !== "❌") {
+                        hasMassInLast7Days = true; 
+                        break;
+                    }
+                }
 
-        alert(`تم حفظ أنشطتك بنجاح! تم تسجيل الوقت: ${timeString}`);
+                if(hasMassInLast7Days) {
+                    massPointsEarned = 5;
+                    massTextForLog = "قداس (ثانٍ 5ن)";
+                    alert("عاش! بما إنك حضرت قداسين في نفس الأسبوع، أخذت 5 نقاط بونص للقداس! ⛪🎉");
+                } else {
+                    massPointsEarned = 2;
+                    massTextForLog = "قداس (أول 2ن)";
+                }
+
+                proceedWithSave(addedPoints + massPointsEarned, massTextForLog);
+            });
+        } else {
+            proceedWithSave(addedPoints, massTextForLog);
+        }
+
+        function proceedWithSave(finalAddedPoints, finalMassText) {
+            if(finalAddedPoints === 0 && !prayStatus && !booksStatus) {
+                alert("لا توجد أنشطة جديدة لحفظها.");
+                return;
+            }
+
+            let newPoints = user.points + finalAddedPoints;
+
+            let updateData = {
+                points: newPoints,
+                danFinished: danFinishedStatus,
+                readDanChapters: allChapters.join(',')
+            };
+
+            if(prayStatus) updateData.lastPrayTime = nowMs;
+            if(booksStatus) updateData.lastBooksTime = nowMs;
+
+            db.ref('users/' + currentUserCode).update(updateData);
+
+            db.ref('history_logs').push({
+                name: user.name,
+                code: user.code,
+                timestamp: fullStamp,
+                danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
+                prayed: prayStatus ? "✅" : (document.getElementById('chkPray').disabled ? "مغلق 🔒" : "❌"),
+                readBooks: booksStatus ? "✅" : (document.getElementById('chkBooks').disabled ? "مغلق 🔒" : "❌"),
+                confessed: confessStatus ? "✅" : "❌",
+                mass: finalMassText,
+                currentTotalPoints: newPoints
+            });
+
+            alert(`تم حفظ أنشطتك بنجاح! تم تسجيل الوقت: ${timeString}`);
+        }
     }
 
     function renderLeaderboard() {
@@ -396,7 +509,7 @@
             
             logList.forEach((log) => {
                 tbody.innerHTML += `<tr>
-                    <td><strong style="color:#fff;">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
+                    <td><strong style="color:var(--title-color);">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
                     <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timestamp}</td>
                     <td style="color:#c471ed; font-size:12px;">${log.danChapters}</td>
                     <td>${log.prayed}</td>
@@ -422,7 +535,7 @@
         
         userList.forEach((user) => {
             tbody.innerHTML += `<tr>
-                <td><strong style="color:#fff;">${user.name}</strong></td>
+                <td><strong style="color:var(--title-color);">${user.name}</strong></td>
                 <td style="color:var(--secondary-glow); font-weight:600;">${user.code}</td>
                 <td style="color:var(--text-muted); font-family:monospace;">${user.password}</td>
                 <td style="color:var(--success-color); font-weight:bold;">${user.points} نقطة</td>
@@ -433,17 +546,12 @@
         });
     }
 
-    // [الدالة السحرية الجديدة لحذف الحسابات نهائياً]
     function deleteUserAccount(userCode, userName) {
         const confirmDelete = confirm(`هل أنت متأكد من حذف حساب المخدوم [ ${userName} ] نهائياً بكافة نقاطه؟`);
         if(confirmDelete) {
             db.ref('users/' + userCode).remove()
-            .then(() => {
-                alert(`تم حذف حساب [ ${userName} ] بنجاح من قاعدة البيانات.`);
-            })
-            .catch((error) => {
-                alert("حدث خطأ أثناء الحذف: " + error.message);
-            });
+            .then(() => { alert(`تم حذف حساب [ ${userName} ] بنجاح من قاعدة البيانات.`); })
+            .catch((error) => { alert("حدث خطأ أثناء الحذف: " + error.message); });
         }
     }
 
