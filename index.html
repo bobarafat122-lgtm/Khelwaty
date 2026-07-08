@@ -18,6 +18,7 @@
             --text-muted: #a49fc6;
             --success-color: #00e676;
             --admin-color: #ff9100;
+            --danger-color: #ff3333;
         }
         
         * { box-sizing: border-box; transition: all 0.3s ease; }
@@ -34,6 +35,8 @@
         .btn-secondary { background: linear-gradient(90deg, #12c2e9 0%, #c471ed 100%); }
         .btn-success { background: linear-gradient(90deg, #00b09b 0%, #96c93d 100%); margin: 20px auto 10px auto; display: block; }
         .btn-admin-top { position: absolute; top: 20px; left: 20px; width: auto; padding: 6px 12px; font-size: 11px; background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--card-border); border-radius: 20px; }
+        .btn-danger-sm { width: auto; padding: 4px 10px; font-size: 11px; background: rgba(255, 51, 51, 0.15); border: 1px solid rgba(255, 51, 51, 0.3); color: var(--danger-color); border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-danger-sm:hover { background: var(--danger-color); color: #fff; }
         .page { display: none; }
         .active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -183,7 +186,7 @@
 
         <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1);">
 
-        <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل (قديم وجديد):</h3>
+        <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها:</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
                 <thead>
@@ -191,7 +194,8 @@
                         <th>اسم المخدوم</th>
                         <th>الكود المخصوص</th>
                         <th>كلمة المرور (الباسورد)</th>
-                        <th>مجموع النقط الحالي</th>
+                        <th>مجموع النقط</th>
+                        <th>إجراءات ⚙️</th>
                     </tr>
                 </thead>
                 <tbody id="allAccountsTableBody"></tbody>
@@ -244,7 +248,7 @@
         if(password === ADMIN_PASSWORD) {
             showPage('adminPage');
             renderAdminTable();
-            renderAllAccountsTable(); // تشغيل جدول دليل الحسابات عند الدخول
+            renderAllAccountsTable();
         } else if(password !== null) {
             alert("Wrong Password!");
         }
@@ -405,15 +409,14 @@
         });
     }
 
-    // [الدالة السحرية الجديدة] لعرض جميع الحسابات المسجلة بلا استثناء
     function renderAllAccountsTable() {
         const tbody = document.getElementById('allAccountsTableBody');
         tbody.innerHTML = '';
         
-        const userList = Object.values(globalUsers).sort((a, b) => b.points - a.points); // ترتيب تنازلي حسب النقط الأعلى
+        const userList = Object.values(globalUsers).sort((a, b) => b.points - a.points);
         
         if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4">لا توجد حسابات مسجلة في المنظومة حتى الآن.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5">لا توجد حسابات مسجلة في المنظومة حتى الآن.</td></tr>`;
             return;
         }
         
@@ -423,12 +426,28 @@
                 <td style="color:var(--secondary-glow); font-weight:600;">${user.code}</td>
                 <td style="color:var(--text-muted); font-family:monospace;">${user.password}</td>
                 <td style="color:var(--success-color); font-weight:bold;">${user.points} نقطة</td>
+                <td>
+                    <button class="btn-danger-sm" onclick="deleteUserAccount('${user.code}', '${user.name}')">🗑️ حذف الحساب</button>
+                </td>
             </tr>`;
         });
+    }
+
+    // [الدالة السحرية الجديدة لحذف الحسابات نهائياً]
+    function deleteUserAccount(userCode, userName) {
+        const confirmDelete = confirm(`هل أنت متأكد من حذف حساب المخدوم [ ${userName} ] نهائياً بكافة نقاطه؟`);
+        if(confirmDelete) {
+            db.ref('users/' + userCode).remove()
+            .then(() => {
+                alert(`تم حذف حساب [ ${userName} ] بنجاح من قاعدة البيانات.`);
+            })
+            .catch((error) => {
+                alert("حدث خطأ أثناء الحذف: " + error.message);
+            });
+        }
     }
 
     function logout() { currentUserCode = null; showPage('welcomePage'); }
 </script>
 </body>
 </html>
-
