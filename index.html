@@ -6,6 +6,8 @@
     <title>Khelwaty - خلوتي</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- إضافة مكتبة Font Awesome للأيقونات واللوجو -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         /* الألوان الافتراضية (الوضع المظلم الداكن) */
@@ -58,6 +60,13 @@
         h2, h3 { text-align: center; color: var(--title-color); font-weight: 800; margin-top: 10px; }
         h2 { font-size: 28px; }
         .welcome-title { background: linear-gradient(to left, var(--title-color), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* تنسيق عنوان الفريق واللوجو ليظهر في المنتصف وبشكل متناسق */
+        .team-title-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 30px; }
+        .team-logo { font-size: 26px; color: var(--secondary-glow); animation: pulse 2s infinite ease-in-out; }
+        .custom-logo-img { width: 32px; height: 32px; object-fit: contain; border-radius: 50%; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
         p { text-align: center; color: var(--text-muted); font-size: 14px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: var(--label-color); }
@@ -100,9 +109,9 @@
 <body>
 
 <div class="container">
-    <!-- أدوات التحكم العلوية (موجودة دائماً وفي كل الصفحات) -->
+    <!-- أدوات التحكم العلوية -->
     <div class="top-controls">
-        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">☀️ الوضع المضيء</button>
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">☀️ Light Mode</button>
         <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
     </div>
 
@@ -151,9 +160,15 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- لوحة التحكم من الداخل (بالعربي) -->
+    <!-- لوحة التحكم من الداخل -->
     <div id="dashboardPage" class="page">
-        <h3 style="margin-top: 30px;">خلوتك الروحية اليومية 🌟</h3>
+        <!-- منطقة اللوجو والاسم المحدثة -->
+        <div class="team-title-container">
+            <!-- أيقونة النسر الجاهزة، لو عايز تغيرها بصورة حط مكان سطر الـ <i> الكود ده: <img src="رابط_الصورة" class="custom-logo-img"> -->
+            <i class="fa-solid fa-eagle team-logo"></i>
+            <h3 style="margin: 0;">Eagles Team 🌟</h3>
+        </div>
+        
         <div class="points-badge">مجموع نقاطك: <span id="userPoints">0</span> نقطة</div>
 
         <div class="task-card">
@@ -186,7 +201,7 @@
             <div class="task-row"><label class="checkbox-container" id="lblMass"><input type="checkbox" id="chkMass"><span>حضور القداس الإلهي (2 نقطة / 5 نقاط للقداس الثاني في الأسبوع)</span></label></div>
         </div>
 
-        <button class="btn-success" onclick="submitProgress()">تحديث وحفظ البيانات الروحية</button>
+        <button class="btn-success" onclick="submitProgress()">update and save</button>
         <hr style="margin: 25px 0;">
         <h3>لوحة الصدارة والترتيب 🏆</h3>
         <table>
@@ -268,10 +283,10 @@
         
         if (currentTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'dark');
-            themeBtn.innerText = "☀️ الوضع المضيء";
+            themeBtn.innerText = "🌙 Dark Mode";
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
-            themeBtn.innerText = "🌙 الوضع المظلم";
+            themeBtn.innerText = "☀️ Light Mode";
         }
     }
 
@@ -290,7 +305,6 @@
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
-        // إظهار زرار الأدمن فقط في الصفحة الرئيسية الترحيبية
         document.getElementById('adminTopBtn').style.display = (pageId === 'welcomePage') ? 'block' : 'none';
     }
 
@@ -347,7 +361,6 @@
         let nowMs = Date.now();
         let twelveHoursMs = 12 * 60 * 60 * 1000;
 
-        // فحص الأجبية
         let lastPray = user.lastPrayTime || 0;
         let chkPray = document.getElementById('chkPray');
         if (nowMs - lastPray < twelveHoursMs) {
@@ -360,7 +373,6 @@
             document.getElementById('lblPray').classList.remove('disabled-label');
         }
 
-        // فحص الكتب الروحية
         let lastBooks = user.lastBooksTime || 0;
         let chkBooks = document.getElementById('chkBooks');
         if (nowMs - lastBooks < twelveHoursMs) {
@@ -486,9 +498,10 @@
         const tbody = document.getElementById('leaderboardBody');
         tbody.innerHTML = '';
         userList.forEach((user, index) => {
+            const isMe = (user.code === currentUserCode) ? ' <span style="color:var(--secondary-glow); font-weight:bold;">(You)</span>' : '';
             tbody.innerHTML += `<tr>
                 <td style="font-weight:bold; color:${index===0?'#ffd700':index===1?'#c0c0c0':'#cd7f32'}">${index + 1}</td>
-                <td>${user.code} ${user.code === currentUserCode ? '<span style="color:var(--secondary-glow);">(أنت)</span>' : ''}</td>
+                <td>${user.code}${isMe}</td>
                 <td style="color:var(--success-color); font-weight:bold;">${user.points}</td>
             </tr>`;
         });
