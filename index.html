@@ -85,7 +85,7 @@
         .task-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: 16px; margin-bottom: 16px; }
         .task-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         
-        /* جعل شبكة الإصحاحات تتسع لـ 15 خانة بشكل مريح */
+        /* شبكة الإصحاحات */
         .chapters-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
         @media(min-width: 500px) { .chapters-grid { grid-template-columns: repeat(4, 1fr); } }
         
@@ -183,12 +183,10 @@
             <label>📖 قراءة سفر دانيال (النبي):</label>
             <span class="hint">الإصحاح المحفوظ سابقاً سيتم قفله رمادياً. قفل الـ 15 خانة بالكامل يمنحك 10 نقط بونص!</span>
             
-            <!-- شبكة الإصحاحات الموسعة لـ 15 تشيك بوكس -->
             <div class="chapters-grid">
                 <label class="checkbox-container" id="lbl-dan-1"><input type="checkbox" class="dan-ch" value="1" id="dan-1"><span>اصحاح 1</span></label>
                 <label class="checkbox-container" id="lbl-dan-2"><input type="checkbox" class="dan-ch" value="2" id="dan-2"><span>اصحاح 2</span></label>
                 <label class="checkbox-container" id="lbl-dan-3"><input type="checkbox" class="dan-ch" value="3" id="dan-3"><span>اصحاح 3</span></label>
-                <label class="checkbox-container" id="lbl-dan-3bonus"><input type="checkbox" class="dan-ch" value="3bonus" id="dan-3bonus"><span style="font-size: 11px;">تتمة اصحاح 3</span></label>
                 <label class="checkbox-container" id="lbl-dan-4"><input type="checkbox" class="dan-ch" value="4" id="dan-4"><span>اصحاح 4</span></label>
                 <label class="checkbox-container" id="lbl-dan-5"><input type="checkbox" class="dan-ch" value="5" id="dan-5"><span>اصحاح 5</span></label>
                 <label class="checkbox-container" id="lbl-dan-6"><input type="checkbox" class="dan-ch" value="6" id="dan-6"><span>اصحاح 6</span></label>
@@ -200,6 +198,7 @@
                 <label class="checkbox-container" id="lbl-dan-12"><input type="checkbox" class="dan-ch" value="12" id="dan-12"><span>اصحاح 12</span></label>
                 <label class="checkbox-container" id="lbl-dan-13"><input type="checkbox" class="dan-ch" value="13" id="dan-13"><span>اصحاح 13</span></label>
                 <label class="checkbox-container" id="lbl-dan-14"><input type="checkbox" class="dan-ch" value="14" id="dan-14"><span>اصحاح 14</span></label>
+                <label class="checkbox-container" id="lbl-dan-3bonus"><input type="checkbox" class="dan-ch" value="3bonus" id="dan-3bonus"><span style="font-size: 11px;">تتمة اصحاح 3</span></label>
             </div>
         </div>
 
@@ -227,7 +226,7 @@
     <div id="adminPage" class="page">
         <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
         
-        <!-- الحاوية الجديدة لمتابعة الأنشطة اليومية مقسمة باليوم -->
+        <!-- الحاوية لمتابعة الأنشطة اليومية مقسمة باليوم بالتفصيل الممل -->
         <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📅 سجل متابعة الأنشطة اليومي (مقسم بالتواريخ):</h3>
         <div id="adminDaysContainer"></div>
 
@@ -252,9 +251,8 @@
 
         <button class="btn-secondary" style="margin-top: 35px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
     </div>
-</div>
-
-<script>
+</div> 
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAUWMRRga0dBeQhdi9jtHBC5vbbxZFWKko",
         authDomain: "khelwaty-6160d.firebaseapp.com",
@@ -294,6 +292,7 @@
         }
         renderLeaderboard();
         if(document.getElementById('adminPage').classList.contains('active')) {
+            renderAdminTable();
             renderAllAccountsTable();
         }
     });
@@ -404,7 +403,6 @@
             }
         });
         
-        // التحقق من اكتمال الـ 15 خانة بالكامل (14 إصحاح + تتمة) للحصول على البونص
         let danFinishedStatus = user.danFinished || false;
         if (allChapters.length === 15 && !danFinishedStatus) {
             addedPoints += 10;
@@ -422,11 +420,17 @@
         if(confessStatus) addedPoints += 10;
 
         let now = new Date();
-        let timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        // استخدام تنسيق التاريخ الهجري/العربي بالشكل الافتراضي
-        let dateString = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' });
-        // الاحتفاظ بالتاريخ بصيغة موحدة للمقارنة والفلترة
-        let rawDateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+        
+        // استخدام تنسيق 12 ساعة بالثواني
+        let timeString = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // توليد تاريخ موحد بصيغة YYYY-MM-DD لتفادي أخطاء الترجمة واختلاف لغات المتصفحات
+        let year = now.getFullYear();
+        let month = String(now.getMonth() + 1).padStart(2, '0');
+        let day = String(now.getDate()).padStart(2, '0');
+        let unifiedDateKey = `${year}-${month}-${day}`;
+        
+        let formattedDisplayDate = `${day}/${month}/${year}`;
 
         let massPointsEarned = 0;
         let massTextForLog = "❌";
@@ -477,17 +481,19 @@
 
             db.ref('users/' + currentUserCode).update(updateData);
 
+            // حفظ التفاصيل الدقيقة للتسجيل الحالي مع النقاط التي حصل عليها في هذا التسجيل بالتحديد
             db.ref('history_logs').push({
                 name: user.name,
                 code: user.code,
-                rawDate: rawDateKey, // حفظ التاريخ الفعلي للمقارنة
-                dayLabel: dateString, // اسم اليوم والتاريخ بالتفصيل للعرض
-                timeLabel: timeString, // الوقت بالدقيقة والثانية
-                danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
-                prayed: prayStatus ? "✅" : (document.getElementById('chkPray').disabled ? "مغلق 🔒" : "❌"),
-                readBooks: booksStatus ? "✅" : (document.getElementById('chkBooks').disabled ? "مغلق 🔒" : "❌"),
-                confessed: confessStatus ? "✅" : "❌",
+                rawDate: unifiedDateKey,           // لحساب الفرز البرمجي الموحد
+                dayLabel: formattedDisplayDate,    // لعرض التاريخ بشكل منسق (13/7)
+                timeLabel: timeString,             // وقت التسجيل بالثانية بالظبط
+                danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.map(ch => ch === '3bonus' ? 'تتمة 3' : `اصحاح ${ch}`).join(', ') : "❌",
+                prayed: prayStatus ? "✅ (2ن)" : (document.getElementById('chkPray').disabled ? "مغلق 🔒" : "❌"),
+                readBooks: booksStatus ? "✅ (2ن)" : (document.getElementById('chkBooks').disabled ? "مغلق 🔒" : "❌"),
+                confessed: confessStatus ? "✅ (10ن)" : "❌",
                 mass: finalMassText,
+                pointsEarnedNow: finalAddedPoints, // النقاط اللي اخدها في التسجيل ده بالظبط
                 currentTotalPoints: newPoints
             });
 
@@ -512,24 +518,22 @@
         });
     }
 
-    // دالة بناء السجلات اليومية المقسمة بجداول لكل يوم
     function renderAdminTable() {
         const container = document.getElementById('adminDaysContainer');
         container.innerHTML = '';
         
         db.ref('history_logs').once('value', (snapshot) => {
             const logs = snapshot.val() || {};
-            const logList = Object.values(logs).reverse();
+            const logList = Object.values(logs);
             
             if(logList.length === 0) {
                 container.innerHTML = `<p style="text-align:center; padding: 20px;">لم يقم أي مخدوم بتسجيل أنشطة بعد.</p>`;
                 return;
             }
             
-            // تقسيم السجلات لمجموعات حسب تاريخ اليوم (rawDate)
+            // تجميع السجلات حسب اليوم
             const groupedLogs = {};
             logList.forEach(log => {
-                // توافقية مع السجلات القديمة اللي مافيهاش rawDate
                 const dateKey = log.rawDate || "سجلات سابقة";
                 const dateLabel = log.dayLabel || "سجلات غير مصنفة";
                 
@@ -542,17 +546,22 @@
                 groupedLogs[dateKey].items.push(log);
             });
 
-            // رسم جدول منفصل لكل يوم
-            for (let dateKey in groupedLogs) {
+            // فرز التواريخ والأنشطة تنازلياً (الأحدث فوق والأقدم تحت)
+            const sortedKeys = Object.keys(groupedLogs).sort((a, b) => b.localeCompare(a));
+
+            sortedKeys.forEach(dateKey => {
                 const group = groupedLogs[dateKey];
+                
+                // ترتيب المخدومين داخل اليوم الواحد بحيث الأحدث تسجيلاً يظهر فوق
+                const sortedItems = group.items.reverse();
                 
                 let daySection = document.createElement('div');
                 daySection.className = 'admin-day-section';
                 
                 let titleHtml = `
                     <div class="admin-day-title">
-                        <i class="fa-regular fa-calendar-check"></i>
-                        <span>${group.label}</span>
+                        <i class="fa-regular fa-calendar-check" style="color: var(--success-color);"></i>
+                        <span style="color: var(--title-color);">يوم: ${group.label}</span>
                     </div>
                 `;
                 
@@ -561,30 +570,38 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>الاسم والكود</th>
-                                    <th>الوقت ⏰</th>
-                                    <th>دانيال الجديد</th>
+                                    <th>المخدوم (الكود)</th>
+                                    <th>سجل الساعة كام بالظبط؟ ⏰</th>
+                                    <th>قرأ إيه في دانيال؟</th>
                                     <th>أجبية</th>
                                     <th>كتب روحية</th>
                                     <th>اعتراف</th>
                                     <th>القداس</th>
-                                    <th>النقاط الحالية</th>
+                                    <th>النقاط الجديدة</th>
+                                    <th>المجموع الكلي</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
                 
-                group.items.forEach(log => {
+                sortedItems.forEach(log => {
+                    let chaptersText = log.danChapters || "❌";
+                    let pointsAddedThisTime = log.pointsEarnedNow !== undefined ? `${log.pointsEarnedNow} نقطة` : "مستورد";
+
                     tableHtml += `
                         <tr>
-                            <td><strong style="color:var(--title-color);">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
-                            <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timeLabel || "غير محدد"}</td>
-                            <td style="color:#c471ed; font-size:12px;">${log.danChapters}</td>
+                            <td>
+                                <strong style="color:var(--title-color);">${log.name}</strong><br>
+                                <small style="color:var(--secondary-glow); font-weight:bold;">${log.code}</small>
+                            </td>
+                            <td style="color:#e65c00; font-size:12px; font-weight:600; direction:ltr;">${log.timeLabel || "غير محدد"}</td>
+                            <td style="color:#c471ed; font-size:12px; font-weight:600;">${chaptersText}</td>
                             <td>${log.prayed}</td>
                             <td>${log.readBooks}</td>
                             <td>${log.confessed}</td>
                             <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
-                            <td style="color:var(--success-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
+                            <td style="color:var(--success-color); font-weight:bold;">+ ${pointsAddedThisTime}</td>
+                            <td style="color:var(--title-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
                         </tr>
                     `;
                 });
@@ -597,7 +614,7 @@
                 
                 daySection.innerHTML = titleHtml + tableHtml;
                 container.appendChild(daySection);
-            }
+            });
         });
     }
 
