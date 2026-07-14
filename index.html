@@ -170,7 +170,7 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- لوحة التحكم من الداخل -->
+    <!-- لوحة التحكم من الداخل للمستخدمين -->
     <div id="dashboardPage" class="page">
         <div class="team-title-container">
             <i class="fa-solid fa-eagle team-logo"></i>
@@ -222,36 +222,11 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- لوحة الأدمن الاحترافية -->
+    <!-- لوحة الأدمن المعدلة بـ 3 خانات -->
     <div id="adminPage" class="page">
-        <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
-        
-        <!-- الحاوية لمتابعة الأنشطة اليومية مقسمة باليوم بالتفصيل الممل -->
-        <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📅 سجل متابعة الأنشطة اليومي (مقسم بالتواريخ):</h3>
-        <div id="adminDaysContainer"></div>
-
-        <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1); border-color: var(--card-border);">
-
-        <!-- دليل الحسابات (الأحدث فوق) -->
-        <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها (الأحدث أولاً):</h3>
-        <div style="overflow-x: auto; width: 100%;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>اسم المخدوم</th>
-                        <th>الكود المخصوص</th>
-                        <th>كلمة المرور (الباسورد)</th>
-                        <th>مجموع النقط</th>
-                        <th>إجراءات ⚙️</th>
-                    </tr>
-                </thead>
-                <tbody id="allAccountsTableBody"></tbody>
-            </table>
-        </div>
-
-        <button class="btn-secondary" style="margin-top: 35px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
+        <!-- يتم بناء العناصر داخلياً عن طريق الـ Script لمنع الهنجة ولترتيب الجداول -->
     </div>
-</div> 
+</div>
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAUWMRRga0dBeQhdi9jtHBC5vbbxZFWKko",
@@ -292,8 +267,7 @@
         }
         renderLeaderboard();
         if(document.getElementById('adminPage').classList.contains('active')) {
-            renderAdminTable();
-            renderAllAccountsTable();
+            renderAdminView();
         }
     });
 
@@ -307,8 +281,7 @@
         const password = prompt("Enter Admin Password:");
         if(password === ADMIN_PASSWORD) {
             showPage('adminPage');
-            renderAdminTable();
-            renderAllAccountsTable();
+            renderAdminView();
         } else if(password !== null) {
             alert("Wrong Password!");
         }
@@ -322,7 +295,8 @@
         let uniqueCode = 'M-' + Math.floor(1000 + Math.random() * 9000);
         db.ref('users/' + uniqueCode).set({
             name: name, password: password, code: uniqueCode, points: 0, danFinished: false,
-            readDanChapters: "", lastPrayTime: 0, lastBooksTime: 0, hasConfessed: false
+            readDanChapters: "", lastPrayTime: 0, lastBooksTime: 0, hasConfessed: false,
+            lastLoggedTimeOnly: "لم يسجل بعد"
         }, (error) => {
             if(!error) { document.getElementById('generatedCode').innerText = uniqueCode; showPage('codePage'); }
         });
@@ -421,15 +395,14 @@
 
         let now = new Date();
         
-        // استخدام تنسيق 12 ساعة بالثواني
-        let timeString = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        // وقت التسجيل بتنسيق 12 ساعة (بدون تاريخ اليوم)
+        let timeStringOnly = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
-        // توليد تاريخ موحد بصيغة YYYY-MM-DD لتفادي أخطاء الترجمة واختلاف لغات المتصفحات
+        // توليد تاريخ موحد بصيغة YYYY-MM-DD لتقسيم الجداول بالأيام
         let year = now.getFullYear();
         let month = String(now.getMonth() + 1).padStart(2, '0');
         let day = String(now.getDate()).padStart(2, '0');
         let unifiedDateKey = `${year}-${month}-${day}`;
-        
         let formattedDisplayDate = `${day}/${month}/${year}`;
 
         let massPointsEarned = 0;
@@ -473,7 +446,8 @@
             let updateData = {
                 points: newPoints,
                 danFinished: danFinishedStatus,
-                readDanChapters: allChapters.join(',')
+                readDanChapters: allChapters.join(','),
+                lastLoggedTimeOnly: timeStringOnly  // حفظ آخر توقيت تسجيل فقط للمستخدم
             };
 
             if(prayStatus) updateData.lastPrayTime = nowMs;
@@ -481,23 +455,23 @@
 
             db.ref('users/' + currentUserCode).update(updateData);
 
-            // حفظ التفاصيل الدقيقة للتسجيل الحالي مع النقاط التي حصل عليها في هذا التسجيل بالتحديد
+            // حفظ السجل التفصيلي اليومي للمتابعة
             db.ref('history_logs').push({
                 name: user.name,
                 code: user.code,
-                rawDate: unifiedDateKey,           // لحساب الفرز البرمجي الموحد
-                dayLabel: formattedDisplayDate,    // لعرض التاريخ بشكل منسق (13/7)
-                timeLabel: timeString,             // وقت التسجيل بالثانية بالظبط
+                rawDate: unifiedDateKey,
+                dayLabel: formattedDisplayDate,
+                timeLabel: timeStringOnly,
                 danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.map(ch => ch === '3bonus' ? 'تتمة 3' : `اصحاح ${ch}`).join(', ') : "❌",
                 prayed: prayStatus ? "✅ (2ن)" : (document.getElementById('chkPray').disabled ? "مغلق 🔒" : "❌"),
                 readBooks: booksStatus ? "✅ (2ن)" : (document.getElementById('chkBooks').disabled ? "مغلق 🔒" : "❌"),
                 confessed: confessStatus ? "✅ (10ن)" : "❌",
                 mass: finalMassText,
-                pointsEarnedNow: finalAddedPoints, // النقاط اللي اخدها في التسجيل ده بالظبط
+                pointsEarnedNow: finalAddedPoints,
                 currentTotalPoints: newPoints
             });
 
-            alert(`تم حفظ أنشطتك بنجاح! تم تسجيل الوقت: ${timeString}`);
+            alert(`تم حفظ أنشطتك بنجاح! تم تسجيل الوقت: ${timeStringOnly}`);
         }
     }
 
@@ -518,16 +492,123 @@
         });
     }
 
-    function renderAdminTable() {
+    // دالة بناء وتنسيق صفحة الأدمن بالـ 3 خانات المطلوبة بالظبط
+    function renderAdminView() {
+        const adminPage = document.getElementById('adminPage');
+        adminPage.innerHTML = ''; // تصفية الصفحة لإعادة بنائها بالتقسيمة الجديدة
+
+        // 👑 عنوان لوحة التحكم الرئيسي
+        adminPage.innerHTML += `<h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>`;
+
+        // ==========================================
+        // 1️⃣ الخانة الأولى: جدول الحالة الأخيرة لكل اليوزرز
+        // ==========================================
+        let section1Html = `
+            <div style="margin-top: 25px;">
+                <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-bottom: 10px;">
+                    <i class="fa-solid fa-user-clock"></i> 1️⃣ جدول آخر تسجيل ونقاط اليوزرز بالكامل:
+                </h3>
+                <div style="overflow-x: auto; width: 100%;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم الحقيقي 👤</th>
+                                <th>آخر وقت سجل فيه ⏰</th>
+                                <th>مجموع النقط الكلي 🏆</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        const allUsersSorted = Object.values(globalUsers).reverse(); // الأحدث تسجيلاً في السيستم أولاً
+        allUsersSorted.forEach(user => {
+            const lastTime = user.lastLoggedTimeOnly || "لم يسجل بعد 💤";
+            section1Html += `
+                <tr>
+                    <td><strong style="color:var(--title-color); font-size:14px;">${user.name}</strong><br><small style="color:var(--text-muted);">الكود: ${user.code}</small></td>
+                    <td style="color:#e65c00; font-family:monospace; font-weight:bold; font-size:13px; direction:ltr;">${lastTime}</td>
+                    <td style="color:var(--success-color); font-weight:bold; font-size:14px;">${user.points} نقطة</td>
+                </tr>
+            `;
+        });
+
+        section1Html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr style="margin: 25px 0; border-color: var(--card-border);">
+        `;
+        adminPage.innerHTML += section1Html;
+
+        // ==========================================
+        // 2️⃣ الخانة الثانية: جداول المتابعة اليومية بالأيام والتفاصيل
+        // ==========================================
+        let section2Container = document.createElement('div');
+        section2Container.innerHTML = `
+            <h3 style="text-align: right; font-size: 16px; color: var(--primary-glow); margin-bottom: 10px;">
+                <i class="fa-regular fa-calendar-days"></i> 2️⃣ سجل المتابعة اليومي التفصيلي (مقسم بالأيام تلقائياً):
+            </h3>
+            <div id="adminDaysContainer"></div>
+            <hr style="margin: 25px 0; border-color: var(--card-border);">
+        `;
+        adminPage.appendChild(section2Container);
+        renderDailyLogsTable(); // استدعاء دالة بناء الجداول اليومية وتفاصيل أنشطتها
+
+        // ==========================================
+        // 3️⃣ الخانة الثالثة: دليل الحسابات للحذف والتحكم
+        // ==========================================
+        let section3Html = `
+            <div style="margin-top: 25px;">
+                <h3 style="text-align: right; font-size: 16px; color: var(--danger-color); margin-bottom: 10px;">
+                    <i class="fa-solid fa-user-gear"></i> 3️⃣ دليل الحسابات المسجلة بالكامل (عرض الباسورد وحذف الأكونت):
+                </h3>
+                <div style="overflow-x: auto; width: 100%;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم الحقيقي 👤</th>
+                                <th>الباسورد 🔑</th>
+                                <th>إجراءات التحكم ⚙️</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        allUsersSorted.forEach(user => {
+            section3Html += `
+                <tr>
+                    <td><strong style="color:var(--title-color); font-size:14px;">${user.name}</strong><br><small style="color:var(--secondary-glow);">الكود: ${user.code}</small></td>
+                    <td style="color:var(--text-muted); font-family:monospace; font-weight:bold;">${user.password}</td>
+                    <td>
+                        <button class="btn-danger-sm" onclick="deleteUserAccount('${user.code}', '${user.name}')">🗑️ حذف الحساب</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        section3Html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button class="btn-secondary" style="margin-top: 35px; margin-bottom: 25px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
+        `;
+        adminPage.innerHTML += section3Html;
+    }
+
+    // دالة بناء وتفصيل الجدول الثاني (الأيام)
+    function renderDailyLogsTable() {
         const container = document.getElementById('adminDaysContainer');
+        if (!container) return;
         container.innerHTML = '';
-        
+
         db.ref('history_logs').once('value', (snapshot) => {
             const logs = snapshot.val() || {};
             const logList = Object.values(logs);
             
             if(logList.length === 0) {
-                container.innerHTML = `<p style="text-align:center; padding: 20px;">لم يقم أي مخدوم بتسجيل أنشطة بعد.</p>`;
+                container.innerHTML = `<p style="text-align:center; padding: 15px; color:var(--text-muted);">لم يسجل أي مخدوم أنشطة بعد.</p>`;
                 return;
             }
             
@@ -535,7 +616,7 @@
             const groupedLogs = {};
             logList.forEach(log => {
                 const dateKey = log.rawDate || "سجلات سابقة";
-                const dateLabel = log.dayLabel || "سجلات غير مصنفة";
+                const dateLabel = log.dayLabel || "سجلات غير تصنيفية";
                 
                 if (!groupedLogs[dateKey]) {
                     groupedLogs[dateKey] = {
@@ -546,17 +627,16 @@
                 groupedLogs[dateKey].items.push(log);
             });
 
-            // فرز التواريخ والأنشطة تنازلياً (الأحدث فوق والأقدم تحت)
+            // ترتيب الأيام الأحدث فوق
             const sortedKeys = Object.keys(groupedLogs).sort((a, b) => b.localeCompare(a));
 
             sortedKeys.forEach(dateKey => {
                 const group = groupedLogs[dateKey];
-                
-                // ترتيب المخدومين داخل اليوم الواحد بحيث الأحدث تسجيلاً يظهر فوق
-                const sortedItems = group.items.reverse();
+                const sortedItems = group.items.reverse(); // الأحدث تسجيلاً يظهر فوق
                 
                 let daySection = document.createElement('div');
                 daySection.className = 'admin-day-section';
+                daySection.style.marginBottom = '15px';
                 
                 let titleHtml = `
                     <div class="admin-day-title">
@@ -570,15 +650,13 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>المخدوم (الكود)</th>
-                                    <th>سجل الساعة كام بالظبط؟ ⏰</th>
-                                    <th>قرأ إيه في دانيال؟</th>
-                                    <th>أجبية</th>
-                                    <th>كتب روحية</th>
-                                    <th>اعتراف</th>
-                                    <th>القداس</th>
-                                    <th>النقاط الجديدة</th>
-                                    <th>المجموع الكلي</th>
+                                    <th>الاسم الحقيقي 👤</th>
+                                    <th>دانيال 📖</th>
+                                    <th>أجبية 🛐</th>
+                                    <th>قراءة 📚</th>
+                                    <th>اعتراف 🛐</th>
+                                    <th>قداس ⛪</th>
+                                    <th>النقاط المحصودة ⚡</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -586,22 +664,20 @@
                 
                 sortedItems.forEach(log => {
                     let chaptersText = log.danChapters || "❌";
-                    let pointsAddedThisTime = log.pointsEarnedNow !== undefined ? `${log.pointsEarnedNow} نقطة` : "مستورد";
+                    let pointsEarned = log.pointsEarnedNow !== undefined ? `+ ${log.pointsEarnedNow}ن` : "مستورد";
 
                     tableHtml += `
                         <tr>
                             <td>
-                                <strong style="color:var(--title-color);">${log.name}</strong><br>
-                                <small style="color:var(--secondary-glow); font-weight:bold;">${log.code}</small>
+                                <strong style="color:var(--title-color); font-size:13px;">${log.name}</strong><br>
+                                <small style="color:var(--secondary-glow);">${log.code}</small>
                             </td>
-                            <td style="color:#e65c00; font-size:12px; font-weight:600; direction:ltr;">${log.timeLabel || "غير محدد"}</td>
                             <td style="color:#c471ed; font-size:12px; font-weight:600;">${chaptersText}</td>
                             <td>${log.prayed}</td>
                             <td>${log.readBooks}</td>
                             <td>${log.confessed}</td>
-                            <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
-                            <td style="color:var(--success-color); font-weight:bold;">+ ${pointsAddedThisTime}</td>
-                            <td style="color:var(--title-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
+                            <td style="color:#00bfff; font-size:11px;">${log.mass}</td>
+                            <td style="color:var(--success-color); font-weight:bold;">${pointsEarned}</td>
                         </tr>
                     `;
                 });
@@ -618,30 +694,6 @@
         });
     }
 
-    function renderAllAccountsTable() {
-        const tbody = document.getElementById('allAccountsTableBody');
-        tbody.innerHTML = '';
-        
-        const userList = Object.values(globalUsers).reverse();
-        
-        if(userList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5">لا توجد حسابات مسجلة في المنظومة حتى الآن.</td></tr>`;
-            return;
-        }
-        
-        userList.forEach((user) => {
-            tbody.innerHTML += `<tr>
-                <td><strong style="color:var(--title-color);">${user.name}</strong></td>
-                <td style="color:var(--secondary-glow); font-weight:600;">${user.code}</td>
-                <td style="color:var(--text-muted); font-family:monospace;">${user.password}</td>
-                <td style="color:var(--success-color); font-weight:bold;">${user.points} نقطة</td>
-                <td>
-                    <button class="btn-danger-sm" onclick="deleteUserAccount('${user.code}', '${user.name}')">🗑️ حذف الحساب</button>
-                </td>
-            </tr>`;
-        });
-    }
-
     function deleteUserAccount(userCode, userName) {
         const confirmDelete = confirm(`هل أنت متأكد من حذف حساب المخدوم [ ${userName} ] نهائياً بكافة نقاطه؟`);
         if(confirmDelete) {
@@ -653,5 +705,5 @@
 
     function logout() { currentUserCode = null; showPage('welcomePage'); }
 </script>
-</body>
-</html>
+
+    
