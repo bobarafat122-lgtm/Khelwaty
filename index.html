@@ -61,10 +61,9 @@
         h2 { font-size: 28px; }
         .welcome-title { background: linear-gradient(to left, var(--title-color), var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* تنسيق عنوان الفريق واللوجو ليظهر في المنتصف وبشكل متناسق */
+        /* تنسيق عنوان الفريق واللوجو */
         .team-title-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 30px; }
         .team-logo { font-size: 26px; color: var(--secondary-glow); animation: pulse 2s infinite ease-in-out; }
-        .custom-logo-img { width: 32px; height: 32px; object-fit: contain; border-radius: 50%; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         p { text-align: center; color: var(--text-muted); font-size: 14px; }
@@ -85,7 +84,11 @@
         .points-badge span { font-size: 24px; font-weight: 800; }
         .task-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: 16px; margin-bottom: 16px; }
         .task-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .chapters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        
+        /* جعل شبكة الإصحاحات تتسع لـ 15 خانة بشكل مريح */
+        .chapters-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        @media(min-width: 500px) { .chapters-grid { grid-template-columns: repeat(4, 1fr); } }
+        
         .checkbox-container { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
         .checkbox-container input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--card-border); border-radius: 5px; background: var(--input-bg); display: grid; place-content: center; cursor: pointer; }
         .checkbox-container input::before { content: "✓"; font-size: 12px; font-weight: bold; color: #fff; transform: scale(0); }
@@ -96,18 +99,21 @@
         [data-theme="dark"] .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; }
         .disabled-label { color: #888 !important; cursor: not-allowed; text-decoration: line-through; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); margin-bottom: 25px; }
         th, td { padding: 10px; text-align: center; font-size: 13px; }
         th { background: var(--table-th-bg); color: var(--title-color); }
         td { background: var(--table-td-bg); border-top: 1px solid var(--card-border); color: var(--text-main); }
         
-        /* ستايل مميز للسطر الخاص باليوزر الحالي في لوحة الصدارة */
         .my-ranking-row { background: rgba(138, 43, 226, 0.15) !important; border: 1px solid var(--primary-glow); }
         
         .nav-links { text-align: center; margin-top: 20px; }
         .nav-links a { color: var(--secondary-glow); text-decoration: none; cursor: pointer; }
         .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
         hr { border: 0; border-top: 1px solid var(--card-border); margin: 15px 0; }
+
+        /* ستايل مخصص لعناوين التواريخ في لوحة الأدمن */
+        .admin-day-section { margin-top: 30px; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .admin-day-title { text-align: right; font-size: 16px; color: var(--secondary-glow); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -166,7 +172,6 @@
 
     <!-- لوحة التحكم من الداخل -->
     <div id="dashboardPage" class="page">
-        <!-- منطقة اللوجو والاسم المحدثة -->
         <div class="team-title-container">
             <i class="fa-solid fa-eagle team-logo"></i>
             <h3 style="margin: 0;">Eagles Team 🌟</h3>
@@ -176,12 +181,14 @@
 
         <div class="task-card">
             <label>📖 قراءة سفر دانيال (النبي):</label>
-            <span class="hint">الإصحاح المحفوظ سابقاً سيتم قفله رمادياً ولا يمكن إعادة اختياره. قفل الـ 12 يمنحك 10 نقط بونص!</span>
+            <span class="hint">الإصحاح المحفوظ سابقاً سيتم قفله رمادياً. قفل الـ 15 خانة بالكامل يمنحك 10 نقط بونص!</span>
             
+            <!-- شبكة الإصحاحات الموسعة لـ 15 تشيك بوكس -->
             <div class="chapters-grid">
                 <label class="checkbox-container" id="lbl-dan-1"><input type="checkbox" class="dan-ch" value="1" id="dan-1"><span>اصحاح 1</span></label>
                 <label class="checkbox-container" id="lbl-dan-2"><input type="checkbox" class="dan-ch" value="2" id="dan-2"><span>اصحاح 2</span></label>
                 <label class="checkbox-container" id="lbl-dan-3"><input type="checkbox" class="dan-ch" value="3" id="dan-3"><span>اصحاح 3</span></label>
+                <label class="checkbox-container" id="lbl-dan-3bonus"><input type="checkbox" class="dan-ch" value="3bonus" id="dan-3bonus"><span style="font-size: 11px;">تتمة اصحاح 3</span></label>
                 <label class="checkbox-container" id="lbl-dan-4"><input type="checkbox" class="dan-ch" value="4" id="dan-4"><span>اصحاح 4</span></label>
                 <label class="checkbox-container" id="lbl-dan-5"><input type="checkbox" class="dan-ch" value="5" id="dan-5"><span>اصحاح 5</span></label>
                 <label class="checkbox-container" id="lbl-dan-6"><input type="checkbox" class="dan-ch" value="6" id="dan-6"><span>اصحاح 6</span></label>
@@ -191,6 +198,8 @@
                 <label class="checkbox-container" id="lbl-dan-10"><input type="checkbox" class="dan-ch" value="10" id="dan-10"><span>اصحاح 10</span></label>
                 <label class="checkbox-container" id="lbl-dan-11"><input type="checkbox" class="dan-ch" value="11" id="dan-11"><span>اصحاح 11</span></label>
                 <label class="checkbox-container" id="lbl-dan-12"><input type="checkbox" class="dan-ch" value="12" id="dan-12"><span>اصحاح 12</span></label>
+                <label class="checkbox-container" id="lbl-dan-13"><input type="checkbox" class="dan-ch" value="13" id="dan-13"><span>اصحاح 13</span></label>
+                <label class="checkbox-container" id="lbl-dan-14"><input type="checkbox" class="dan-ch" value="14" id="dan-14"><span>اصحاح 14</span></label>
             </div>
         </div>
 
@@ -218,29 +227,13 @@
     <div id="adminPage" class="page">
         <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
         
-        <!-- الجدول الأول: السجل اليومي بالحركات -->
-        <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📝 سجل متابعة الأنشطة اليومي (بالوقت والدقيقة):</h3>
-        <div style="overflow-x: auto; width: 100%;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>الاسم والكود</th>
-                        <th>التاريخ والوقت ⏰</th>
-                        <th>دانيال الجديد</th>
-                        <th>أجبية</th>
-                        <th>كتب روحية</th>
-                        <th>اعتراف</th>
-                        <th>القداس</th>
-                        <th>إجمالي النقاط</th>
-                    </tr>
-                </thead>
-                <tbody id="adminTableBody"></tbody>
-            </table>
-        </div>
+        <!-- الحاوية الجديدة لمتابعة الأنشطة اليومية مقسمة باليوم -->
+        <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📅 سجل متابعة الأنشطة اليومي (مقسم بالتواريخ):</h3>
+        <div id="adminDaysContainer"></div>
 
         <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1); border-color: var(--card-border);">
 
-        <!-- الجدول الثاني: دليل كل الحسابات (مُرتب من الأحدث للأقدم) -->
+        <!-- دليل الحسابات (الأحدث فوق) -->
         <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها (الأحدث أولاً):</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
@@ -411,11 +404,12 @@
             }
         });
         
+        // التحقق من اكتمال الـ 15 خانة بالكامل (14 إصحاح + تتمة) للحصول على البونص
         let danFinishedStatus = user.danFinished || false;
-        if (allChapters.length === 12 && !danFinishedStatus) {
+        if (allChapters.length === 15 && !danFinishedStatus) {
             addedPoints += 10;
             danFinishedStatus = true;
-            alert("مبروك! تم قفل السفر بالكامل وأخذت 10 نقاط بونص 📖🎉");
+            alert("مبروك! تم قفل السفر بالكامل (14 إصحاح وتتمة إصحاح 3) وأخذت 10 نقاط بونص 📖🎉");
         }
 
         let prayStatus = document.getElementById('chkPray').checked && !document.getElementById('chkPray').disabled;
@@ -429,8 +423,10 @@
 
         let now = new Date();
         let timeString = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        let dateString = now.toLocaleDateString('ar-EG', { month: 'numeric', day: 'numeric' });
-        let fullStamp = `${dateString} - الساعة ${timeString}`;
+        // استخدام تنسيق التاريخ الهجري/العربي بالشكل الافتراضي
+        let dateString = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' });
+        // الاحتفاظ بالتاريخ بصيغة موحدة للمقارنة والفلترة
+        let rawDateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
         let massPointsEarned = 0;
         let massTextForLog = "❌";
@@ -484,7 +480,9 @@
             db.ref('history_logs').push({
                 name: user.name,
                 code: user.code,
-                timestamp: fullStamp,
+                rawDate: rawDateKey, // حفظ التاريخ الفعلي للمقارنة
+                dayLabel: dateString, // اسم اليوم والتاريخ بالتفصيل للعرض
+                timeLabel: timeString, // الوقت بالدقيقة والثانية
                 danChapters: newlySelectedChapters.length > 0 ? newlySelectedChapters.join(',') : "❌",
                 prayed: prayStatus ? "✅" : (document.getElementById('chkPray').disabled ? "مغلق 🔒" : "❌"),
                 readBooks: booksStatus ? "✅" : (document.getElementById('chkBooks').disabled ? "مغلق 🔒" : "❌"),
@@ -514,40 +512,99 @@
         });
     }
 
+    // دالة بناء السجلات اليومية المقسمة بجداول لكل يوم
     function renderAdminTable() {
-        const tbody = document.getElementById('adminTableBody');
-        tbody.innerHTML = '';
+        const container = document.getElementById('adminDaysContainer');
+        container.innerHTML = '';
         
         db.ref('history_logs').once('value', (snapshot) => {
             const logs = snapshot.val() || {};
             const logList = Object.values(logs).reverse();
             
             if(logList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8">لم يقم أي مخدوم بتسجيل أنشطة بعد.</td></tr>`;
+                container.innerHTML = `<p style="text-align:center; padding: 20px;">لم يقم أي مخدوم بتسجيل أنشطة بعد.</p>`;
                 return;
             }
             
-            logList.forEach((log) => {
-                tbody.innerHTML += `<tr>
-                    <td><strong style="color:var(--title-color);">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
-                    <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timestamp}</td>
-                    <td style="color:#c471ed; font-size:12px;">${log.danChapters}</td>
-                    <td>${log.prayed}</td>
-                    <td>${log.readBooks}</td>
-                    <td>${log.confessed}</td>
-                    <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
-                    <td style="color:var(--success-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
-                </tr>`;
+            // تقسيم السجلات لمجموعات حسب تاريخ اليوم (rawDate)
+            const groupedLogs = {};
+            logList.forEach(log => {
+                // توافقية مع السجلات القديمة اللي مافيهاش rawDate
+                const dateKey = log.rawDate || "سجلات سابقة";
+                const dateLabel = log.dayLabel || "سجلات غير مصنفة";
+                
+                if (!groupedLogs[dateKey]) {
+                    groupedLogs[dateKey] = {
+                        label: dateLabel,
+                        items: []
+                    };
+                }
+                groupedLogs[dateKey].items.push(log);
             });
+
+            // رسم جدول منفصل لكل يوم
+            for (let dateKey in groupedLogs) {
+                const group = groupedLogs[dateKey];
+                
+                let daySection = document.createElement('div');
+                daySection.className = 'admin-day-section';
+                
+                let titleHtml = `
+                    <div class="admin-day-title">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>${group.label}</span>
+                    </div>
+                `;
+                
+                let tableHtml = `
+                    <div style="overflow-x: auto; width: 100%;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الاسم والكود</th>
+                                    <th>الوقت ⏰</th>
+                                    <th>دانيال الجديد</th>
+                                    <th>أجبية</th>
+                                    <th>كتب روحية</th>
+                                    <th>اعتراف</th>
+                                    <th>القداس</th>
+                                    <th>النقاط الحالية</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                group.items.forEach(log => {
+                    tableHtml += `
+                        <tr>
+                            <td><strong style="color:var(--title-color);">${log.name}</strong><br><small style="color:var(--text-muted);">${log.code}</small></td>
+                            <td style="color:#e65c00; font-size:12px; font-weight:600;">${log.timeLabel || "غير محدد"}</td>
+                            <td style="color:#c471ed; font-size:12px;">${log.danChapters}</td>
+                            <td>${log.prayed}</td>
+                            <td>${log.readBooks}</td>
+                            <td>${log.confessed}</td>
+                            <td style="color:#00bfff; font-size:12px;">${log.mass}</td>
+                            <td style="color:var(--success-color); font-weight:bold;">${log.currentTotalPoints}ن</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                daySection.innerHTML = titleHtml + tableHtml;
+                container.appendChild(daySection);
+            }
         });
     }
 
-    // الدالة المحدثة: تعرض الحسابات حسب وقت الإنشاء (الأحدث فوق والأقدم تحت)
     function renderAllAccountsTable() {
         const tbody = document.getElementById('allAccountsTableBody');
         tbody.innerHTML = '';
         
-        // جلب الحسابات بترتيبها الطبيعي وعكس المصفوفة لتصبح الأحدث أولاً
         const userList = Object.values(globalUsers).reverse();
         
         if(userList.length === 0) {
