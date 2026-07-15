@@ -6,6 +6,7 @@
     <title>Khelwaty - خلوتي</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- إضافة مكتبة Font Awesome للأيقونات واللوجو -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -98,7 +99,7 @@
         [data-theme="dark"] .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; }
         .disabled-label { color: #888 !important; cursor: not-allowed; text-decoration: line-through; }
 
-        /* ستايل متجاوب جداً للجداول على الشاشات والموبايل */
+        /* ستايل متجاوب جداً للجداول لمنع تشويه الأسماء نهائياً */
         table {
             width: 100%;
             border-collapse: separate;
@@ -109,22 +110,31 @@
             overflow: hidden;
             border: 1px solid var(--card-border);
             font-size: 12px;
-            table-layout: auto;
+            table-layout: auto; /* يجعل حجم العمود يتأقلم مرناً مع المحتوى */
         }
         th, td {
-            padding: 10px 6px;
+            padding: 12px 10px;
             text-align: center;
-            word-break: break-word;
         }
         th {
             background: var(--table-th-bg);
             color: var(--title-color);
             font-weight: 700;
+            white-space: nowrap; /* يمنع نزول عناوين الجدول بالطول */
         }
         td {
             background: var(--table-td-bg);
             border-top: 1px solid var(--card-border);
             color: var(--text-main);
+        }
+        
+        /* دمج الخواص الآتية لضمان فرد الأسماء دائماً بالعرض */
+        .prevent-vertical-name {
+            white-space: nowrap !important; /* تمنع كسر الاسم نهائياً تحت أي ظرف */
+            text-align: right;            /* لمحاذاة مريحة للعين */
+            min-width: 120px;             /* حجز مساحة عرض دنيا مناسبة للاسم بالكامل */
+            word-break: keep-all !important;
+            overflow: visible !important;
         }
         
         .my-ranking-row { background: rgba(138, 43, 226, 0.15) !important; border: 1px solid var(--primary-glow); }
@@ -142,11 +152,13 @@
 <body>
 
 <div class="container">
+    <!-- أدوات التحكم العلوية -->
     <div class="top-controls">
         <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">☀️ Light Mode</button>
         <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
     </div>
 
+    <!-- صفحة الترحيب -->
     <div id="welcomePage" class="page active">
         <h2 class="welcome-title" style="margin-top: 50px; margin-bottom: 5px;">Khelwaty</h2>
         <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
@@ -154,6 +166,7 @@
         <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
     </div>
 
+    <!-- صفحة إنشاء حساب -->
     <div id="registerPage" class="page">
         <h2 style="margin-top: 30px;">Create Account</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -168,12 +181,14 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
+    <!-- صفحة ظهور الكود -->
     <div id="codePage" class="page">
         <h2>Account Created! 🎉</h2>
         <div class="code-display" id="generatedCode"></div>
         <button onclick="showPage('loginPage')">Go to Login</button>
     </div>
 
+    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="page">
         <h2 style="margin-top: 30px;">Login</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -188,6 +203,7 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
+    <!-- لوحة التحكم من الداخل -->
     <div id="dashboardPage" class="page">
         <div class="team-title-container">
             <i class="fa-solid fa-eagle team-logo"></i>
@@ -232,21 +248,26 @@
         <button class="btn-success" onclick="submitProgress()">update and save</button>
         <hr style="margin: 25px 0;">
         <h3>لوحة الصدارة والترتيب 🏆</h3>
-        <table>
-            <thead><tr><th>الترتيب</th><th>الكود المخصوص</th><th>إجمالي النقاط</th></tr></thead>
-            <tbody id="leaderboardBody"></tbody>
-        </table>
+        <div style="overflow-x: auto; width: 100%;">
+            <table>
+                <thead><tr><th>الترتيب</th><th>الكود المخصوص</th><th>إجمالي النقاط</th></tr></thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+        </div>
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
+    <!-- لوحة الأدمن الاحترافية -->
     <div id="adminPage" class="page">
         <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
         
+        <!-- الحاوية لمتابعة الأنشطة اليومية مقسمة باليوم بالتفصيل الممل -->
         <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📅 سجل متابعة الأنشطة اليومي (مقسم بالتواريخ):</h3>
         <div id="adminDaysContainer"></div>
 
         <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1); border-color: var(--card-border);">
 
+        <!-- دليل الحسابات (الأحدث فوق) -->
         <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها (الأحدث أولاً):</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
@@ -263,6 +284,8 @@
             </table>
         </div>
 
+        <!-- أزرار التحكم والعمليات للأدمن -->
+        <!-- زرار تصفير الدورة (النقاط والأقفال فقط مع بقاء الهيستوري) -->
         <button style="background: linear-gradient(90deg, #ff9100 0%, #ff3333 100%); margin-top: 35px; border: 1px solid rgba(255,255,255,0.2);" onclick="resetActiveProgressOnly()">
             🔄 بدء دورة جديدة (تصفير النقاط وفتح الإصحاحات مع الحفاظ على السجل القديم)
         </button>
@@ -609,7 +632,7 @@
 
                     tableHtml += `
                         <tr>
-                            <td>
+                            <td class="prevent-vertical-name">
                                 <strong style="color:var(--title-color);">${log.name}</strong><br>
                                 <small style="color:var(--secondary-glow); font-weight:bold;">${log.code}</small>
                             </td>
@@ -650,7 +673,7 @@
         
         userList.forEach((user) => {
             tbody.innerHTML += `<tr>
-                <td><strong style="color:var(--title-color);">${user.name}</strong></td>
+                <td class="prevent-vertical-name"><strong style="color:var(--title-color);">${user.name}</strong></td>
                 <td style="color:var(--secondary-glow); font-weight:600;">${user.code}</td>
                 <td style="color:var(--text-muted); font-family:monospace;">${user.password}</td>
                 <td style="color:var(--success-color); font-weight:bold;">${user.points} نقطة</td>
