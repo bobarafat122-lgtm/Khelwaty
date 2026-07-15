@@ -6,7 +6,6 @@
     <title>Khelwaty - خلوتي</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <!-- إضافة مكتبة Font Awesome للأيقونات واللوجو -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -143,13 +142,11 @@
 <body>
 
 <div class="container">
-    <!-- أدوات التحكم العلوية -->
     <div class="top-controls">
         <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()">☀️ Light Mode</button>
         <button id="adminTopBtn" class="btn-admin-top" onclick="accessAdmin()">Admin Panel 🔐</button>
     </div>
 
-    <!-- صفحة الترحيب -->
     <div id="welcomePage" class="page active">
         <h2 class="welcome-title" style="margin-top: 50px; margin-bottom: 5px;">Khelwaty</h2>
         <p style="margin-bottom: 30px;">Welcome! Please login or create a new account.</p>
@@ -157,7 +154,6 @@
         <button class="btn-secondary" onclick="showPage('registerPage')">Create New Account</button>
     </div>
 
-    <!-- صفحة إنشاء حساب -->
     <div id="registerPage" class="page">
         <h2 style="margin-top: 30px;">Create Account</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -172,14 +168,12 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- صفحة ظهور الكود -->
     <div id="codePage" class="page">
         <h2>Account Created! 🎉</h2>
         <div class="code-display" id="generatedCode"></div>
         <button onclick="showPage('loginPage')">Go to Login</button>
     </div>
 
-    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="page">
         <h2 style="margin-top: 30px;">Login</h2>
         <div class="form-group" style="margin-top: 20px;">
@@ -194,7 +188,6 @@
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
 
-    <!-- لوحة التحكم من الداخل -->
     <div id="dashboardPage" class="page">
         <div class="team-title-container">
             <i class="fa-solid fa-eagle team-logo"></i>
@@ -246,17 +239,14 @@
         <button style="background: linear-gradient(90deg, #e65c00 0%, #f9d423 100%); margin-top: 25px;" onclick="logout()">تسجيل الخروج</button>
     </div>
 
-    <!-- لوحة الأدمن الاحترافية -->
     <div id="adminPage" class="page">
         <h2 style="margin-top: 30px; color: var(--admin-color);">لوحة تحكم خلوتي الكلية 👑</h2>
         
-        <!-- الحاوية لمتابعة الأنشطة اليومية مقسمة باليوم بالتفصيل الممل -->
         <h3 style="text-align: right; font-size: 16px; color: var(--secondary-glow); margin-top: 25px;">📅 سجل متابعة الأنشطة اليومي (مقسم بالتواريخ):</h3>
         <div id="adminDaysContainer"></div>
 
         <hr style="margin: 35px 0; border-top: 2px dashed rgba(255,255,255,0.1); border-color: var(--card-border);">
 
-        <!-- دليل الحسابات (الأحدث فوق) -->
         <h3 style="text-align: right; font-size: 16px; color: var(--success-color);">👥 دليل الحسابات المسجلة بالكامل وإدارتها (الأحدث أولاً):</h3>
         <div style="overflow-x: auto; width: 100%;">
             <table>
@@ -273,8 +263,6 @@
             </table>
         </div>
 
-        <!-- أزرار التحكم والعمليات للأدمن -->
-        <!-- زرار تصفير الدورة (النقاط والأقفال فقط مع بقاء الهيستوري) -->
         <button style="background: linear-gradient(90deg, #ff9100 0%, #ff3333 100%); margin-top: 35px; border: 1px solid rgba(255,255,255,0.2);" onclick="resetActiveProgressOnly()">
             🔄 بدء دورة جديدة (تصفير النقاط وفتح الإصحاحات مع الحفاظ على السجل القديم)
         </button>
@@ -548,6 +536,7 @@
         });
     }
 
+    // دالة بناء جداول الإدارة وحفظ السجلات مقسمة باليوم
     function renderAdminTable() {
         const container = document.getElementById('adminDaysContainer');
         container.innerHTML = '';
