@@ -99,10 +99,34 @@
         [data-theme="dark"] .checkbox-container input:disabled { background: #333 !important; border-color: #555 !important; }
         .disabled-label { color: #888 !important; cursor: not-allowed; text-decoration: line-through; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); margin-bottom: 25px; }
-        th, td { padding: 10px; text-align: center; font-size: 13px; }
-        th { background: var(--table-th-bg); color: var(--title-color); }
-        td { background: var(--table-td-bg); border-top: 1px solid var(--card-border); color: var(--text-main); }
+        /* ستايل متجاوب جداً للجداول على الشاشات والموبايل */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            font-size: 12px;
+            table-layout: auto;
+        }
+        th, td {
+            padding: 10px 6px;
+            text-align: center;
+            word-break: break-word;
+        }
+        th {
+            background: var(--table-th-bg);
+            color: var(--title-color);
+            font-weight: 700;
+        }
+        td {
+            background: var(--table-td-bg);
+            border-top: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
         
         .my-ranking-row { background: rgba(138, 43, 226, 0.15) !important; border: 1px solid var(--primary-glow); }
         
@@ -249,10 +273,16 @@
             </table>
         </div>
 
-        <button class="btn-secondary" style="margin-top: 35px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
+        <!-- أزرار التحكم والعمليات للأدمن -->
+        <!-- زرار تصفير الدورة (النقاط والأقفال فقط مع بقاء الهيستوري) -->
+        <button style="background: linear-gradient(90deg, #ff9100 0%, #ff3333 100%); margin-top: 35px; border: 1px solid rgba(255,255,255,0.2);" onclick="resetActiveProgressOnly()">
+            🔄 بدء دورة جديدة (تصفير النقاط وفتح الإصحاحات مع الحفاظ على السجل القديم)
+        </button>
+
+        <button class="btn-secondary" style="margin-top: 15px;" onclick="showPage('welcomePage')">العودة للرئيسية</button>
     </div>
 </div> 
-    <script>
+<script>
     const firebaseConfig = {
         apiKey: "AIzaSyAUWMRRga0dBeQhdi9jtHBC5vbbxZFWKko",
         authDomain: "khelwaty-6160d.firebaseapp.com",
@@ -649,6 +679,47 @@
             .then(() => { alert(`تم حذف حساب [ ${userName} ] بنجاح من قاعدة البيانات.`); })
             .catch((error) => { alert("حدث خطأ أثناء الحذف: " + error.message); });
         }
+    }
+
+    // دالة تصفير نقاط المخدومين وفتح الأقفال مع الحفاظ على سجلات الأنشطة القديمة كاملة
+    function resetActiveProgressOnly() {
+        const confirm1 = confirm("⚠️ تنبيه:\nهل أنت متأكد من تصفير نقاط المخدومين وفتح الإصحاحات والأقفال لبدء دورة جديدة؟\n(ملاحظة: السجلات القديمة وجداول الأدمن لن تُمسح وستظل معروضة بالكامل كما هي).");
+        if (!confirm1) return;
+
+        const confirm2 = confirm("🚨 تأكيد نهائي:\nتصفير الـ Scores الحالية وفتح الإصحاحات لجميع الحسابات؟");
+        if (!confirm2) return;
+
+        const usersRef = db.ref('users');
+        usersRef.once('value', (snapshot) => {
+            const users = snapshot.val() || {};
+            const updates = {};
+
+            // نمر على كل مستخدم ونصفّر تقدمه الحالي فقط دون حذف الحساب أو السجل
+            for (let code in users) {
+                updates[`users/${code}/points`] = 0;
+                updates[`users/${code}/danFinished`] = false;
+                updates[`users/${code}/readDanChapters`] = "";
+                updates[`users/${code}/lastPrayTime`] = 0;
+                updates[`users/${code}/lastBooksTime`] = 0;
+                updates[`users/${code}/hasConfessed`] = false;
+            }
+
+            // تحديث قاعدة البيانات
+            db.ref().update(updates)
+            .then(() => {
+                alert("🎉 تم بدء الدورة الجديدة بنجاح! تم تصفير نقاط المخدومين وفتح جميع الإصحاحات والأقفال، مع الاحتفاظ بكامل السجلات القديمة في لوحة الأدمن.");
+                
+                // تسجيل خروج لتحديث واجهة المستخدم
+                if(currentUserCode) {
+                    logout();
+                } else {
+                    showPage('welcomePage');
+                }
+            })
+            .catch((error) => {
+                alert("حدث خطأ أثناء التصفير: " + error.message);
+            });
+        });
     }
 
     function logout() { currentUserCode = null; showPage('welcomePage'); }
