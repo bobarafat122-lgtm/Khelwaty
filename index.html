@@ -199,6 +199,15 @@
             <label>Password:</label>
             <input type="password" id="loginPassword" placeholder="****">
         </div>
+        
+        <!-- مربع اختيار Remember Me المحدث -->
+        <div class="form-group" style="margin-top: 15px; margin-bottom: 15px;">
+            <label class="checkbox-container" style="display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="rememberMe" style="width: 16px; height: 16px; margin: 0;">
+                <span style="font-size: 14px; color: var(--text-muted); font-weight: 600;">Remember Me 💾</span>
+            </label>
+        </div>
+
         <button onclick="handleLogin()">Sign In</button>
         <div class="nav-links"><a onclick="showPage('welcomePage')">Back to Home</a></div>
     </div>
@@ -325,6 +334,18 @@
         }
     }
 
+    // التحقق من وجود بيانات Remember Me عند تحميل الصفحة وتعبئتها
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedCode = localStorage.getItem('khelwaty_code');
+        const savedPass = localStorage.getItem('khelwaty_pass');
+        
+        if (savedCode && savedPass) {
+            document.getElementById('loginCode').value = savedCode;
+            document.getElementById('loginPassword').value = savedPass;
+            document.getElementById('rememberMe').checked = true;
+        }
+    });
+
     db.ref('users').on('value', (snapshot) => {
         globalUsers = snapshot.val() || {};
         if(currentUserCode && globalUsers[currentUserCode]) {
@@ -369,17 +390,32 @@
         });
     }
 
+    // دالة تسجيل الدخول المعدلة لدعم ميزة الـ Remember Me
     function handleLogin() {
         const code = document.getElementById('loginCode').value.trim().toUpperCase();
         const pass = document.getElementById('loginPassword').value.trim();
+        const remember = document.getElementById('rememberMe').checked;
+        
         const user = globalUsers[code];
         if(user && user.password === pass) {
             currentUserCode = code; 
+            
+            // حفظ أو إزالة البيانات من التخزين المحلي بناءً على حالة الخيار
+            if (remember) {
+                localStorage.setItem('khelwaty_code', code);
+                localStorage.setItem('khelwaty_pass', pass);
+            } else {
+                localStorage.removeItem('khelwaty_code');
+                localStorage.removeItem('khelwaty_pass');
+            }
+
             showPage('dashboardPage');
             document.getElementById('userPoints').innerText = user.points;
             applyLocks(user);
             renderLeaderboard(); 
-        } else { alert('Invalid Code or Password!'); }
+        } else { 
+            alert('Invalid Code or Password!'); 
+        }
     }
 
     function applyLocks(user) {
